@@ -1,0 +1,350 @@
+{
+  "sources": {
+    "parquet": [
+      "s3://ontopic-public-data/sample-data/health_zip.parquet",
+      "https://ontopic-public-data.t3.tigrisfiles.io/sample-data/health_zip.parquet"
+    ],
+    "pmtiles": "https://ontopic-public-data.t3.tigrisfiles.io/pmtiles/Health_Zip_converted.pmtiles"
+  },
+  "join": {
+    "parquet_rows": 31634,
+    "tile_rows": 32263,
+    "overlap": 31491,
+    "parquet_only": 143,
+    "tile_only": 772,
+    "overlap_pct_of_parquet": 99.55,
+    "duplicate_zip_in_parquet": 0,
+    "duplicate_zip_in_tiles": 0
+  },
+  "metrics": {
+    "arthritis": {
+      "source": "pmtiles",
+      "n": 31491,
+      "min": 2.2,
+      "max": 65.9,
+      "mean": 28.105,
+      "p2": 14.7,
+      "p50": 28.5,
+      "p98": 40.5,
+      "out_of_pct_range": 0,
+      "pop_weighted_national": 24.355,
+      "suggested_domain": [
+        14.7,
+        24.4,
+        40.5
+      ]
+    },
+    "bphigh": {
+      "source": "pmtiles",
+      "n": 31491,
+      "min": 5.3,
+      "max": 70.3,
+      "mean": 34.736,
+      "p2": 21.0,
+      "p50": 34.6,
+      "p98": 48.9,
+      "out_of_pct_range": 0,
+      "pop_weighted_national": 31.728,
+      "suggested_domain": [
+        21.0,
+        31.7,
+        48.9
+      ]
+    },
+    "cancer": {
+      "source": "pmtiles",
+      "n": 31491,
+      "min": 0.6,
+      "max": 23.3,
+      "mean": 7.506,
+      "p2": 3.8,
+      "p50": 7.6,
+      "p98": 10.7,
+      "out_of_pct_range": 0,
+      "pop_weighted_national": 6.595,
+      "suggested_domain": [
+        3.8,
+        6.6,
+        10.7
+      ]
+    },
+    "casthma": {
+      "source": "pmtiles",
+      "n": 31491,
+      "min": 5.1,
+      "max": 22.1,
+      "mean": 9.878,
+      "p2": 7.7,
+      "p50": 9.9,
+      "p98": 12.8,
+      "out_of_pct_range": 0,
+      "pop_weighted_national": 9.653,
+      "suggested_domain": [
+        7.7,
+        9.7,
+        12.8
+      ]
+    },
+    "chd": {
+      "source": "pmtiles",
+      "n": 31491,
+      "min": 0.4,
+      "max": 24.4,
+      "mean": 6.976,
+      "p2": 3.1,
+      "p50": 6.9,
+      "p98": 11.3,
+      "out_of_pct_range": 0,
+      "pop_weighted_national": 5.869,
+      "suggested_domain": [
+        3.1,
+        5.9,
+        11.3
+      ]
+    },
+    "copd": {
+      "source": "pmtiles",
+      "n": 31491,
+      "min": 0.9,
+      "max": 23.4,
+      "mean": 8.178,
+      "p2": 3.5,
+      "p50": 8.0,
+      "p98": 14.1,
+      "out_of_pct_range": 0,
+      "pop_weighted_national": 6.896,
+      "suggested_domain": [
+        3.5,
+        6.9,
+        14.1
+      ]
+    },
+    "depression": {
+      "source": "pmtiles",
+      "n": 31491,
+      "min": 7.7,
+      "max": 38.2,
+      "mean": 21.676,
+      "p2": 14.9,
+      "p50": 21.7,
+      "p98": 29.4,
+      "out_of_pct_range": 0,
+      "pop_weighted_national": 20.584,
+      "suggested_domain": [
+        14.9,
+        20.6,
+        29.4
+      ]
+    },
+    "diabetes": {
+      "source": "pmtiles",
+      "n": 31491,
+      "min": 0.6,
+      "max": 33.5,
+      "mean": 11.405,
+      "p2": 5.7,
+      "p50": 11.1,
+      "p98": 19.0,
+      "out_of_pct_range": 0,
+      "pop_weighted_national": 10.606,
+      "suggested_domain": [
+        5.7,
+        10.6,
+        19.0
+      ]
+    },
+    "ghlth": {
+      "source": "pmtiles",
+      "n": 31491,
+      "min": 4.0,
+      "max": 55.3,
+      "mean": 20.344,
+      "p2": 10.4,
+      "p50": 19.5,
+      "p98": 35.1,
+      "out_of_pct_range": 0,
+      "pop_weighted_national": 19.477,
+      "suggested_domain": [
+        10.4,
+        19.5,
+        35.1
+      ]
+    },
+    "highchol": {
+      "source": "pmtiles",
+      "n": 31491,
+      "min": 6.5,
+      "max": 53.9,
+      "mean": 33.723,
+      "p2": 22.9,
+      "p50": 34.1,
+      "p98": 42.2,
+      "out_of_pct_range": 0,
+      "pop_weighted_national": 31.406,
+      "suggested_domain": [
+        22.9,
+        31.4,
+        42.2
+      ]
+    },
+    "kidney": {
+      "source": "pmtiles",
+      "n": 31491,
+      "min": 0.5,
+      "max": 10.2,
+      "mean": 3.141,
+      "p2": 1.8,
+      "p50": 3.1,
+      "p98": 4.9,
+      "out_of_pct_range": 0,
+      "pop_weighted_national": 2.921,
+      "suggested_domain": [
+        1.8,
+        2.9,
+        4.9
+      ]
+    },
+    "mhlth": {
+      "source": "pmtiles",
+      "n": 31491,
+      "min": 4.9,
+      "max": 41.7,
+      "mean": 15.368,
+      "p2": 10.1,
+      "p50": 15.1,
+      "p98": 22.5,
+      "out_of_pct_range": 0,
+      "pop_weighted_national": 15.048,
+      "suggested_domain": [
+        10.1,
+        15.0,
+        22.5
+      ]
+    },
+    "phlth": {
+      "source": "pmtiles",
+      "n": 31491,
+      "min": 2.9,
+      "max": 35.2,
+      "mean": 14.26,
+      "p2": 8.0,
+      "p50": 14.0,
+      "p98": 22.2,
+      "out_of_pct_range": 0,
+      "pop_weighted_national": 13.13,
+      "suggested_domain": [
+        8.0,
+        13.1,
+        22.2
+      ]
+    },
+    "stroke": {
+      "source": "pmtiles",
+      "n": 31491,
+      "min": 0.3,
+      "max": 13.3,
+      "mean": 3.722,
+      "p2": 1.8,
+      "p50": 3.6,
+      "p98": 6.4,
+      "out_of_pct_range": 0,
+      "pop_weighted_national": 3.309,
+      "suggested_domain": [
+        1.8,
+        3.3,
+        6.4
+      ]
+    },
+    "teethlost": {
+      "source": "pmtiles",
+      "n": 31491,
+      "min": -1.0,
+      "max": 59.9,
+      "mean": 16.012,
+      "p2": 5.8,
+      "p50": 15.2,
+      "p98": 31.9,
+      "out_of_pct_range": 161,
+      "pop_weighted_national": 14.559,
+      "suggested_domain": [
+        5.8,
+        14.6,
+        31.9
+      ]
+    },
+    "obesity_rate": {
+      "source": "parquet",
+      "n": 31491,
+      "min": 11.8,
+      "max": 56.3,
+      "mean": 34.338,
+      "p2": 21.6,
+      "p50": 34.9,
+      "p98": 45.2,
+      "out_of_pct_range": 0,
+      "pop_weighted_national": 32.228,
+      "suggested_domain": [
+        21.6,
+        32.2,
+        45.2
+      ]
+    },
+    "smoking_rate": {
+      "source": "parquet",
+      "n": 31491,
+      "min": 3.0,
+      "max": 49.1,
+      "mean": 19.545,
+      "p2": 9.5,
+      "p50": 19.3,
+      "p98": 30.8,
+      "out_of_pct_range": 0,
+      "pop_weighted_national": 17.577,
+      "suggested_domain": [
+        9.5,
+        17.6,
+        30.8
+      ]
+    }
+  },
+  "adi_summary": {
+    "n": 31222,
+    "mn": 10.481,
+    "mx": 214.813,
+    "mean": 100.256
+  },
+  "spot_check_zips": [
+    {
+      "zip": "10001",
+      "diabetes": 6.7,
+      "obesity_rate": 18.3,
+      "area_deprivation_index": 84.4817713354269,
+      "population": 21102,
+      "median_income": 113382.0
+    },
+    {
+      "zip": "60601",
+      "diabetes": 5.0,
+      "obesity_rate": 19.5,
+      "area_deprivation_index": 60.5824234780352,
+      "population": 11110,
+      "median_income": 165136.0
+    },
+    {
+      "zip": "90011",
+      "diabetes": 13.2,
+      "obesity_rate": 35.9,
+      "area_deprivation_index": 146.71692165667199,
+      "population": 103892,
+      "median_income": 35484.0
+    },
+    {
+      "zip": "99501",
+      "diabetes": 9.0,
+      "obesity_rate": 33.0,
+      "area_deprivation_index": 99.49468776722121,
+      "population": 17603,
+      "median_income": 73843.0
+    }
+  ]
+}

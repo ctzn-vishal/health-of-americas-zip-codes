@@ -1,0 +1,12 @@
+# Data-prep pipeline deps (DuckDB-over-Tigris -> app payloads).
+# Pinned for a clean, reproducible build. numpy<2 keeps shapely / mapbox-vector-tile
+# ABI-compatible while remaining fine for duckdb/pandas/scikit-learn.
+numpy<2
+duckdb==1.4.2
+pandas>=2.0,<2.3
+python-dotenv>=1.0
+pmtiles>=3.4
+mapbox-vector-tile>=2.1
+shapely>=2.0
+scipy>=1.11
+scikit-learn>=1.3

@@ -1,0 +1,239 @@
+{
+  "summary": {
+    "total_checks": 42,
+    "pass": 42,
+    "fail": 0,
+    "overall": "PASS"
+  },
+  "cardinality": {
+    "parquet_distinct_zips": 31634,
+    "tile_distinct_zips": 32263,
+    "overlap": 31491,
+    "pq_dups": 0,
+    "tile_dups": 0,
+    "pq_only": 143,
+    "tile_only": 772
+  },
+  "checks": [
+    {
+      "name": "cardinality",
+      "status": "PASS",
+      "detail": "parquet=31634(exp 31634), tiles=32263(exp 32263), overlap=31491(exp 31491), pq_dups=0, tile_dups=0, pq_only=143, tile_only=772",
+      "counts": {
+        "pq_zips": 31634,
+        "tile_zips": 32263,
+        "overlap": 31491,
+        "pq_dups": 0,
+        "tile_dups": 0,
+        "pq_only": 143,
+        "tile_only": 772
+      }
+    },
+    {
+      "name": "extraction_integrity",
+      "status": "PASS",
+      "detail": "0 mismatches across 1658 verified zips (1658 total from 40 tiles)"
+    },
+    {
+      "name": "metric_catalog_diabetes",
+      "status": "PASS",
+      "detail": "n=31491, bench=10.61, p2=5.7, p98=19.0, min=0.6, max=33.5"
+    },
+    {
+      "name": "metric_catalog_bphigh",
+      "status": "PASS",
+      "detail": "n=31491, bench=31.73, p2=21.0, p98=48.9, min=5.3, max=70.3"
+    },
+    {
+      "name": "metric_catalog_chd",
+      "status": "PASS",
+      "detail": "n=31491, bench=5.87, p2=3.1, p98=11.3, min=0.4, max=24.4"
+    },
+    {
+      "name": "metric_catalog_copd",
+      "status": "PASS",
+      "detail": "n=31491, bench=6.9, p2=3.5, p98=14.1, min=0.9, max=23.4"
+    },
+    {
+      "name": "metric_catalog_obesity_rate",
+      "status": "PASS",
+      "detail": "n=31491, bench=32.23, p2=21.6, p98=45.2, min=11.8, max=56.3"
+    },
+    {
+      "name": "metric_catalog_smoking_rate",
+      "status": "PASS",
+      "detail": "n=31491, bench=17.58, p2=9.5, p98=30.8, min=3.0, max=49.1"
+    },
+    {
+      "name": "metric_catalog_depression",
+      "status": "PASS",
+      "detail": "n=31491, bench=20.58, p2=14.9, p98=29.4, min=7.7, max=38.2"
+    },
+    {
+      "name": "metric_catalog_mhlth",
+      "status": "PASS",
+      "detail": "n=31491, bench=15.05, p2=10.1, p98=22.5, min=4.9, max=41.7"
+    },
+    {
+      "name": "metric_catalog_ghlth",
+      "status": "PASS",
+      "detail": "n=31491, bench=19.48, p2=10.4, p98=35.1, min=4.0, max=55.3"
+    },
+    {
+      "name": "metric_catalog_teethlost",
+      "status": "PASS",
+      "detail": "n=31330, bench=14.57, p2=6.1, p98=31.9, min=2.7, max=59.9"
+    },
+    {
+      "name": "map_values_diabetes",
+      "status": "PASS",
+      "detail": "count=31491==31491, no negatives, 5 spot-checks OK"
+    },
+    {
+      "name": "map_values_bphigh",
+      "status": "PASS",
+      "detail": "count=31491==31491, no negatives, 5 spot-checks OK"
+    },
+    {
+      "name": "map_values_chd",
+      "status": "PASS",
+      "detail": "count=31491==31491, no negatives, 5 spot-checks OK"
+    },
+    {
+      "name": "map_values_copd",
+      "status": "PASS",
+      "detail": "count=31491==31491, no negatives, 5 spot-checks OK"
+    },
+    {
+      "name": "map_values_obesity_rate",
+      "status": "PASS",
+      "detail": "count=31491==31491, no negatives, 5 spot-checks OK"
+    },
+    {
+      "name": "map_values_smoking_rate",
+      "status": "PASS",
+      "detail": "count=31491==31491, no negatives, 5 spot-checks OK"
+    },
+    {
+      "name": "map_values_depression",
+      "status": "PASS",
+      "detail": "count=31491==31491, no negatives, 5 spot-checks OK"
+    },
+    {
+      "name": "map_values_mhlth",
+      "status": "PASS",
+      "detail": "count=31491==31491, no negatives, 5 spot-checks OK"
+    },
+    {
+      "name": "map_values_ghlth",
+      "status": "PASS",
+      "detail": "count=31491==31491, no negatives, 5 spot-checks OK"
+    },
+    {
+      "name": "map_values_teethlost",
+      "status": "PASS",
+      "detail": "count=31330==31330, no negatives, 5 spot-checks OK"
+    },
+    {
+      "name": "charts_diabetes",
+      "status": "PASS",
+      "detail": "national_avg OK, high_burden_pop OK, top_zip=79846, tmb=7.7, corr={'context': 'median_income', 'rho': -0.688, 'n': 29492}"
+    },
+    {
+      "name": "charts_bphigh",
+      "status": "PASS",
+      "detail": "national_avg OK, high_burden_pop OK, top_zip=35052, tmb=10.1, corr={'context': 'median_income', 'rho': -0.558, 'n': 29492}"
+    },
+    {
+      "name": "charts_chd",
+      "status": "PASS",
+      "detail": "national_avg OK, high_burden_pop OK, top_zip=45428, tmb=2.7, corr={'context': 'median_income', 'rho': -0.592, 'n': 29492}"
+    },
+    {
+      "name": "charts_copd",
+      "status": "PASS",
+      "detail": "national_avg OK, high_burden_pop OK, top_zip=24862, tmb=4.2, corr={'context': 'median_income', 'rho': -0.644, 'n': 29492}"
+    },
+    {
+      "name": "charts_obesity_rate",
+      "status": "PASS",
+      "detail": "national_avg OK, high_burden_pop OK, top_zip=44510, tmb=14.2, corr={'context': 'percent_college_graduated', 'rho': -0.63, 'n': 31410}"
+    },
+    {
+      "name": "charts_smoking_rate",
+      "status": "PASS",
+      "detail": "national_avg OK, high_burden_pop OK, top_zip=87018, tmb=11.3, corr={'context': 'percent_college_graduated', 'rho': -0.719, 'n': 31410}"
+    },
+    {
+      "name": "charts_depression",
+      "status": "PASS",
+      "detail": "national_avg OK, high_burden_pop OK, top_zip=44101, tmb=2.5, corr={'context': 'median_income', 'rho': -0.369, 'n': 29492}"
+    },
+    {
+      "name": "charts_mhlth",
+      "status": "PASS",
+      "detail": "national_avg OK, high_burden_pop OK, top_zip=44101, tmb=7.5, corr={'context': 'area_deprivation_index', 'rho': 0.715, 'n': 31222}"
+    },
+    {
+      "name": "charts_ghlth",
+      "status": "PASS",
+      "detail": "national_avg OK, high_burden_pop OK, top_zip=79846, tmb=18.8, corr={'context': 'area_deprivation_index', 'rho': 0.798, 'n': 31222}"
+    },
+    {
+      "name": "charts_teethlost",
+      "status": "PASS",
+      "detail": "national_avg OK, high_burden_pop OK, top_zip=87018, tmb=17.3, corr={'context': 'area_deprivation_index', 'rho': 0.8, 'n': 31185}"
+    },
+    {
+      "name": "sanity_diabetes",
+      "status": "PASS",
+      "detail": "all in [0,100], benchmark in [min,max], domain strictly increasing"
+    },
+    {
+      "name": "sanity_bphigh",
+      "status": "PASS",
+      "detail": "all in [0,100], benchmark in [min,max], domain strictly increasing"
+    },
+    {
+      "name": "sanity_chd",
+      "status": "PASS",
+      "detail": "all in [0,100], benchmark in [min,max], domain strictly increasing"
+    },
+    {
+      "name": "sanity_copd",
+      "status": "PASS",
+      "detail": "all in [0,100], benchmark in [min,max], domain strictly increasing"
+    },
+    {
+      "name": "sanity_obesity_rate",
+      "status": "PASS",
+      "detail": "all in [0,100], benchmark in [min,max], domain strictly increasing"
+    },
+    {
+      "name": "sanity_smoking_rate",
+      "status": "PASS",
+      "detail": "all in [0,100], benchmark in [min,max], domain strictly increasing"
+    },
+    {
+      "name": "sanity_depression",
+      "status": "PASS",
+      "detail": "all in [0,100], benchmark in [min,max], domain strictly increasing"
+    },
+    {
+      "name": "sanity_mhlth",
+      "status": "PASS",
+      "detail": "all in [0,100], benchmark in [min,max], domain strictly increasing"
+    },
+    {
+      "name": "sanity_ghlth",
+      "status": "PASS",
+      "detail": "all in [0,100], benchmark in [min,max], domain strictly increasing"
+    },
+    {
+      "name": "sanity_teethlost",
+      "status": "PASS",
+      "detail": "all in [0,100], benchmark in [min,max], domain strictly increasing"
+    }
+  ],
+  "failures": []
+}

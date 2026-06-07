@@ -1,0 +1,56 @@
+{
+  "pmtiles_url": "https://ontopic-public-data.t3.tigrisfiles.io/pmtiles/Health_Zip_converted.pmtiles",
+  "tile_type": "TileType.MVT",
+  "min_zoom": 0,
+  "max_zoom": 10,
+  "bounds": {
+    "min_lon": -176.696676,
+    "min_lat": 18.905547,
+    "max_lon": -66.925986,
+    "max_lat": 71.341324
+  },
+  "center": {
+    "lon": -74.003906,
+    "lat": 40.846927,
+    "zoom": 10
+  },
+  "vector_layers": [
+    {
+      "id": "zipcode_demographics",
+      "fields": {
+        "ARTHRITIS_zip": "Number",
+        "BPHIGH_zip": "Number",
+        "CANCER_zip": "Number",
+        "CASTHMA_zip": "Number",
+        "CHD_zip": "Number",
+        "COPD_zip": "Number",
+        "DEPRESSION_zip": "Number",
+        "DIABETES_zip": "Number",
+        "GHLTH_zip": "Number",
+        "HIGHCHOL_zip": "Number",
+        "KIDNEY_zip": "Number",
+        "MHLTH_zip": "Number",
+        "PHLTH_zip": "Number",
+        "STROKE_zip": "Number",
+        "TEETHLOST_zip": "Number",
+        "zip_code": "String"
+      },
+      "minzoom": 0,
+      "maxzoom": 10
+    }
+  ],
+  "metadata_keys": [
+    "name",
+    "format",
+    "type",
+    "description",
+    "version",
+    "strategies",
+    "generator",
+    "generator_options",
+    "antimeridian_adjusted_bounds",
+    "vector_layers",
+    "tilestats"
+  ],
+  "metadata_name": "./data/Health_Zip_converted.pmtiles"
+}

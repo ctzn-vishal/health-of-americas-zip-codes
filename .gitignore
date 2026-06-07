@@ -1,0 +1,24 @@
+# secrets — never commit
+.env
+.env.*
+
+# local, machine-specific Claude Code settings
+.claude/settings.local.json
+
+# extracted skill bundle + local pmtiles copy (large, re-downloadable)
+_extracted/
+claude-dataviz-marketplace.zip
+data-prep/Health_Zip_converted.pmtiles
+data-prep/tile_health.parquet
+data-prep/.venv/
+__pycache__/
+*.pyc
+
+# next / node
+web/node_modules/
+web/.next/
+web/out/
+web/test-results/
+web/playwright-report/
+web/verify-shots/
+web/tsconfig.tsbuildinfo

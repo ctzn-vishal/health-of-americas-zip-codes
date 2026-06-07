@@ -1,0 +1,31 @@
+{
+  "name": "health-of-americas-zip-codes",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Health of America's ZIP Codes — a server-rendered, map-first atlas of U.S. health outcomes by ZIP/ZCTA (MapLibre + PMTiles choropleth with D3 panels).",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "d3": "^7.9.0",
+    "maplibre-gl": "^4.7.1",
+    "next": "15.1.6",
+    "pmtiles": "^4.1.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@types/d3": "^7.4.3",
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  }
+}
