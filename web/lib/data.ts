@@ -6,7 +6,10 @@ import type {
   InsightsPayload,
   MapValues,
   MetricCatalog,
+  MetricDistributions,
+  ProfileShard,
   RegionCatalog,
+  StateSummary,
 } from "./types";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
@@ -32,3 +35,9 @@ export const loadGeoCatalog = () => get<GeoCatalog>("geo_catalog.json");
 export const loadMapValues = (metric: string) => get<MapValues>(`map_values/${metric}.json`);
 export const loadCharts = (metric: string) => get<ChartsPayload>(`charts/${metric}.json`);
 export const loadInsights = (metric: string) => get<InsightsPayload>(`insights/${metric}.json`);
+
+// snapshot ("by place") payloads
+export const loadMetricDistributions = () => get<MetricDistributions>("metric_distributions.json");
+export const loadStateSummary = () => get<StateSummary>("state_summary.json");
+export const loadProfileShard = (zip2: string) => get<ProfileShard>(`profiles/${zip2}.json`);
+export const loadComposite = () => get<MapValues>("map_values/composite.json");

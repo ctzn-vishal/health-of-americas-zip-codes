@@ -5,9 +5,13 @@ chronic, behavioral, mental, and general-health measures, each mapped against th
 and the neighborhood deprivation gradient.
 
 - **31,491** ZIP/ZCTA areas · **10** health measures (5 domains) · **~297M** people in mapped areas
-- A dark "civic health observatory" interface: a luminous MapLibre + PMTiles choropleth that recolors
-  via feature-state (no source rebuild), with four D3 analytical panels, an insight rail, a ZIP
-  profile card, and URL-shareable state.
+- A dark "civic health observatory" interface with two complementary views in the atlas:
+  - **ZIP health snapshot** (by place): pick a ZIP for a composite health score plus strip-plot small
+    multiples that place it against its **state** and the **nation** across all 10 measures. The map
+    zooms to the ZIP's metro and shades areas by overall burden.
+  - **Explore by measure** (one outcome at a time): a luminous MapLibre + PMTiles choropleth that
+    recolors via feature-state, with four D3 analytical panels and an insight rail.
+- Selecting a ZIP **zooms the map to its metro**; state is URL-shareable.
 - Crawlable by design: the landing, methods, and sources pages render **real content and numbers**
   into static HTML — no "Loading…"-only shell.
 
@@ -55,11 +59,24 @@ npm run build      # static export → web/out
 | Route       | Rendering | What it is                                                            |
 | ----------- | --------- | -------------------------------------------------------------------- |
 | `/`         | static    | Editorial landing page with live headline stats from the manifest    |
-| `/atlas`    | static shell + client | The interactive choropleth, charts, insight rail, ZIP profile |
+| `/atlas`    | static shell + client | Interactive atlas — `?view=snapshot` (by place) or `?view=measure` (by outcome) |
 | `/methods`  | static    | Methodology, ZIP-vs-ZCTA, view modes, missingness, accessibility     |
 | `/sources`  | static    | Underlying files and per-measure provenance                          |
 
 `sitemap.xml`, `robots.txt`, and an Open Graph image are generated at build.
+
+## Precomputed snapshot data
+
+The "by place" snapshot is powered by compact artifacts derived **from the already-committed
+`public/data` payloads** (no Python/Tigris needed):
+
+```bash
+cd web && npm run gen:profiles   # → metric_distributions.json, state_summary.json,
+                                 #   profiles/{zip2}.json, map_values/composite.json
+```
+
+Re-run this after regenerating the base payloads with the Python pipeline. The outputs are committed
+and served as static assets, so each ZIP snapshot loads only a small shard at runtime.
 
 ## Tech stack
 

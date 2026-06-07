@@ -1,18 +1,24 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useUrlState } from "@/lib/urlState";
 import {
-  loadCharts, loadGeoCatalog, loadInsights, loadMapValues, loadMetricCatalog, loadRegionCatalog,
+  loadCharts, loadComposite, loadGeoCatalog, loadInsights, loadMapValues, loadMetricCatalog,
+  loadMetricDistributions, loadProfileShard, loadRegionCatalog, loadStateSummary,
 } from "@/lib/data";
 import { percentileOf, valueFmt, fmtPop } from "@/lib/format";
+import { COMPOSITE_META } from "@/lib/snapshot";
 import type {
-  ChartsPayload, GeoCatalog, InsightsPayload, MapValues, MetricCatalog, MetricMeta, RegionCatalog,
+  ChartsPayload, GeoCatalog, InsightsPayload, MapValues, MetricCatalog, MetricDistributions,
+  MetricMeta, Mode, ProfileZip, RegionCatalog, StateSummary,
 } from "@/lib/types";
 import Controls from "./Controls";
 import Legend from "./Legend";
 import InsightRail from "./InsightRail";
 import ZipCard from "./ZipCard";
+import ZipSearch from "./search/ZipSearch";
+import SnapshotScoreCard from "./snapshot/SnapshotScoreCard";
+import HealthSnapshot from "./snapshot/HealthSnapshot";
 
 const US_BOUNDS: [number, number, number, number] = [-125, 24, -66.5, 49.5];
 
@@ -38,37 +44,43 @@ const PANELS: { Cmp: any; title: string; sub: string }[] = [
 
 export default function AppClient() {
   const [state, setState] = useUrlState();
+  const isSnap = state.view === "snapshot";
 
   const [catalog, setCatalog] = useState<MetricCatalog | null>(null);
   const [regions, setRegions] = useState<RegionCatalog | null>(null);
   const [geo, setGeo] = useState<GeoCatalog | null>(null);
 
+  // measure-view payloads
   const [mapValues, setMapValues] = useState<MapValues | null>(null);
   const [charts, setCharts] = useState<ChartsPayload | null>(null);
   const [insights, setInsights] = useState<InsightsPayload | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // snapshot-view payloads
+  const [composite, setComposite] = useState<MapValues | null>(null);
+  const [dists, setDists] = useState<MetricDistributions | null>(null);
+  const [stateSummary, setStateSummary] = useState<StateSummary | null>(null);
+  const [profile, setProfile] = useState<ProfileZip | null>(null);
+
   const [hovered, setHovered] = useState<string | null>(null);
   const [pointer, setPointer] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [overMap, setOverMap] = useState(false); // floating tooltip only while pointer is on the map
+  const [overMap, setOverMap] = useState(false);
 
-  // eager catalogs + lazy geo names
   useEffect(() => {
     loadMetricCatalog().then(setCatalog).catch(() => {});
     loadRegionCatalog().then(setRegions).catch(() => {});
     loadGeoCatalog().then(setGeo).catch(() => {});
   }, []);
 
-  // resolve metric meta (with fallback)
   const meta: MetricMeta | null = useMemo(() => {
     if (!catalog) return null;
     return catalog.metrics.find((m) => m.metric_id === state.metric) ?? catalog.metrics.find((m) => m.metric_id === catalog.default_metric) ?? catalog.metrics[0];
   }, [catalog, state.metric]);
   const metricInvalid = !!catalog && !catalog.metrics.some((m) => m.metric_id === state.metric);
 
-  // metric payloads (stale-but-visible: keep old until new resolves)
+  // measure payloads (skip in snapshot view)
   useEffect(() => {
-    if (!meta) return;
+    if (!meta || isSnap) return;
     let alive = true;
     setLoading(true);
     Promise.all([loadMapValues(meta.metric_id), loadCharts(meta.metric_id), loadInsights(meta.metric_id)])
@@ -78,145 +90,206 @@ export default function AppClient() {
       })
       .catch(() => alive && setLoading(false));
     return () => { alive = false; };
-  }, [meta]);
+  }, [meta, isSnap]);
 
-  // region bounds
+  // snapshot base payloads (composite map + distributions + state means)
+  useEffect(() => {
+    if (!isSnap) return;
+    loadComposite().then(setComposite).catch(() => {});
+    loadMetricDistributions().then(setDists).catch(() => {});
+    loadStateSummary().then(setStateSummary).catch(() => {});
+  }, [isSnap]);
+
+  // selected ZIP profile (used by the snapshot)
+  useEffect(() => {
+    const z = state.selected;
+    if (!z) { setProfile(null); return; }
+    let alive = true;
+    loadProfileShard(z.slice(0, 2)).then((sh) => { if (alive) setProfile(sh.zips[z] ?? null); }).catch(() => alive && setProfile(null));
+    return () => { alive = false; };
+  }, [state.selected]);
+
+  // map framing: zoom to the selected ZIP's metro, else the chosen region
   const bounds = useMemo<[number, number, number, number]>(() => {
+    const rec = state.selected && geo ? geo.zips[state.selected] : undefined;
+    if (rec) {
+      const lat = rec[3], lon = rec[4];
+      const dLat = 0.55;
+      const dLon = 0.55 / Math.max(0.25, Math.cos((lat * Math.PI) / 180));
+      return [lon - dLon, lat - dLat, lon + dLon, lat + dLat];
+    }
     const r = regions?.regions.find((x) => x.id === state.region);
     return (r?.bounds as [number, number, number, number]) ?? US_BOUNDS;
-  }, [regions, state.region]);
+  }, [geo, state.selected, regions, state.region]);
 
-  // sorted values for percentile lookups
-  const sortedValues = useMemo(
-    () => (mapValues ? Object.values(mapValues.values).sort((a, b) => a - b) : []),
-    [mapValues],
-  );
+  // what the shared map paints
+  const mapPayload = isSnap ? composite : mapValues;
+  const mapMeta = isSnap ? COMPOSITE_META : meta;
+  const mapMode: Mode = isSnap ? "rate" : state.mode;
+  const mapBusy = isSnap ? !composite : loading;
 
   const selected = state.selected;
+  const sortedValues = useMemo(() => (mapValues ? Object.values(mapValues.values).sort((a, b) => a - b) : []), [mapValues]);
   const selectedValue = selected && mapValues ? mapValues.values[selected] : undefined;
   const selectedPct = selectedValue != null ? percentileOf(sortedValues, selectedValue) : undefined;
   const geoRec = selected && geo ? geo.zips[selected] : undefined;
   const hoverRec = hovered && geo ? geo.zips[hovered] : undefined;
-  const hoverVal = hovered && mapValues ? mapValues.values[hovered] : undefined;
+  const hoverVal = hovered && mapPayload ? mapPayload.values[hovered] : undefined;
 
   const onSelect = (zip: string | null) => setState({ selected: zip ?? undefined });
-  const fmt = meta ? valueFmt(meta.format, meta.unit) : (v: number) => `${v}`;
+  const mapFmt = mapMeta ? valueFmt(mapMeta.format, mapMeta.unit) : (v: number) => `${v}`;
 
-  if (!catalog || !meta) {
+  if (!catalog || !meta || !mapMeta) {
     return <main className="app"><p className="muted" style={{ padding: 40 }}>Loading the atlas…</p></main>;
   }
 
   const placeOf = (rec?: GeoCatalog["zips"][string]) => (rec ? `${rec[0]}, ${rec[1]}` : "");
+  const stateMeans = profile && stateSummary ? stateSummary[profile.c[1]] : undefined;
 
   return (
     <main id="main" className="app">
       <header className="masthead">
         <span className="kicker">ZIP Health Atlas</span>
-        <h1>U.S. health outcomes, ZIP code by ZIP code</h1>
+        <h1>{isSnap ? "A health snapshot for any ZIP code" : "U.S. health outcomes, ZIP code by ZIP code"}</h1>
         <p className="sub">
-          Ten health measures across {catalog.metrics[0] ? "31,491" : ""} ZIP codes — mapped against the
-          national average and against neighborhood deprivation. Estimates are modeled (CDC PLACES-style);
-          associations are ecological, not causal.
+          {isSnap
+            ? `Pick a ZIP code to see where it lands on every measure — against its state and the nation — with one composite health score. Estimates are modeled; associations are ecological, not causal.`
+            : `Ten health measures across 31,491 ZIP codes — mapped against the national average and against neighborhood deprivation. Estimates are modeled (CDC PLACES-style); associations are ecological, not causal.`}
         </p>
       </header>
 
-      <Controls metrics={catalog.metrics} regions={regions?.regions ?? []} state={state} onChange={setState} />
+      <div className="view-tabs" role="tablist" aria-label="Choose a view">
+        <button role="tab" aria-selected={isSnap} className={isSnap ? "active" : ""} onClick={() => setState({ view: "snapshot" })}>
+          ZIP health snapshot
+        </button>
+        <button role="tab" aria-selected={!isSnap} className={!isSnap ? "active" : ""} onClick={() => setState({ view: "measure" })}>
+          Explore by measure
+        </button>
+      </div>
 
-      {metricInvalid && (
-        <div className="notice" role="status">
-          Unknown measure “{state.metric}”. Showing <strong>{meta.label}</strong> instead.
+      {isSnap ? (
+        <div className="controls">
+          <div className="field" style={{ flex: "1 1 280px", maxWidth: 360 }}>
+            <label>Find a ZIP</label>
+            <ZipSearch compact onSubmit={(z) => setState({ selected: z })} placeholder="ZIP code — e.g. 10001" />
+          </div>
+          <div className="field">
+            <label htmlFor="snap-region">Zoom to</label>
+            <select id="snap-region" value={state.region} onChange={(e) => setState({ region: e.target.value, selected: undefined })}>
+              {(regions?.regions ?? []).map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
+            </select>
+          </div>
         </div>
+      ) : (
+        <Controls metrics={catalog.metrics} regions={regions?.regions ?? []} state={state} onChange={setState} />
+      )}
+
+      {!isSnap && metricInvalid && (
+        <div className="notice" role="status">Unknown measure “{state.metric}”. Showing <strong>{meta.label}</strong> instead.</div>
       )}
 
       <div className="stage">
         <div className="map-col">
           <div
             className="map-frame"
-            aria-busy={loading}
+            aria-busy={mapBusy}
             onMouseEnter={() => setOverMap(true)}
             onMouseLeave={() => { setOverMap(false); setHovered(null); }}
-            onMouseMove={(e) => {
-              const r = e.currentTarget.getBoundingClientRect();
-              setPointer({ x: e.clientX - r.left, y: e.clientY - r.top });
-            }}
+            onMouseMove={(e) => { const r = e.currentTarget.getBoundingClientRect(); setPointer({ x: e.clientX - r.left, y: e.clientY - r.top }); }}
           >
             <MapChoropleth
-              payload={mapValues}
-              mode={state.mode}
-              domain={meta.domain}
-              benchmark={meta.benchmark}
+              payload={mapPayload}
+              mode={mapMode}
+              domain={mapMeta.domain}
+              benchmark={mapMeta.benchmark}
               bounds={bounds}
               selected={selected}
               hovered={hovered}
               onSelect={onSelect}
               onHover={setHovered}
             />
-            <Legend mode={state.mode} domain={meta.domain} benchmark={meta.benchmark} fmt={fmt} title={meta.short_label} lowerIsBetter={meta.lower_is_better} />
+            <Legend mode={mapMode} domain={mapMeta.domain} benchmark={mapMeta.benchmark} fmt={mapFmt} title={mapMeta.short_label} lowerIsBetter={mapMeta.lower_is_better} />
             {hovered && overMap && (
               <div className="tooltip" style={{ left: Math.min(pointer.x + 14, 9999), top: pointer.y + 14 }}>
                 <div className="tt-name">{placeOf(hoverRec) || `ZIP ${hovered}`}</div>
                 <div className="tt-val">
-                  {meta.short_label}: {hoverVal != null ? fmt(hoverVal) : "no estimate"}
+                  {mapMeta.short_label}: {hoverVal != null ? mapFmt(hoverVal) : "no estimate"}
                   {hoverRec ? ` · ${fmtPop(hoverRec[5])} people` : ""}
                 </div>
               </div>
             )}
-            {loading && <div className="tooltip" style={{ left: 14, top: 14, background: "var(--panel-2)" }}>Updating…</div>}
+            {mapBusy && <div className="tooltip" style={{ left: 14, top: 14, background: "var(--panel-2)" }}>Updating…</div>}
           </div>
           <p className="muted" style={{ fontSize: 12.5, marginTop: 8 }}>
-            Hover a ZIP for its value; click to pin it. {meta.description}. Denominator: {meta.denominator}.
-            {meta.missing_count > 0 ? ` ${meta.missing_count.toLocaleString()} ZIPs have no estimate (shown grey).` : ""}
+            {isSnap
+              ? "Shaded by overall health burden — deeper red means higher combined burden across all measures. Hover a ZIP for its percentile; click for its full snapshot."
+              : <>Hover a ZIP for its value; click to pin it. {meta.description}. Denominator: {meta.denominator}.{meta.missing_count > 0 ? ` ${meta.missing_count.toLocaleString()} ZIPs have no estimate (shown grey).` : ""}</>}
           </p>
         </div>
 
         <aside>
-          {selected && (
-            <div style={{ marginBottom: 12 }}>
-              <ZipCard
-                zip={selected}
-                place={placeOf(geoRec)}
-                region={geoRec?.[2]}
-                population={geoRec?.[5]}
-                meta={meta}
-                value={selectedValue}
-                percentile={selectedPct}
-                onClear={() => onSelect(null)}
-              />
-            </div>
+          {isSnap ? (
+            selected && profile ? (
+              <SnapshotScoreCard zip={selected} profile={profile} nMeasured={profile.m.filter(Boolean).length} onClear={() => onSelect(null)} />
+            ) : (
+              <div className="snap-empty">
+                <h2>See any ZIP&apos;s health snapshot</h2>
+                <p className="muted">
+                  Search a ZIP code above, or click any area on the map, to see how it compares across
+                  all {catalog.metrics.length} measures — against its state and the nation — with one
+                  composite health score.
+                </p>
+                {selected && !profile && <p className="muted">Loading ZIP {selected}…</p>}
+              </div>
+            )
+          ) : (
+            <>
+              {selected && (
+                <div style={{ marginBottom: 12 }}>
+                  <ZipCard zip={selected} place={placeOf(geoRec)} region={geoRec?.[2]} population={geoRec?.[5]} meta={meta} value={selectedValue} percentile={selectedPct} onClear={() => onSelect(null)} />
+                </div>
+              )}
+              {insights && <InsightRail insights={insights.insights} onSelect={onSelect} metricLabel={meta.label} />}
+            </>
           )}
-          {insights && <InsightRail insights={insights.insights} onSelect={onSelect} metricLabel={meta.label} />}
         </aside>
       </div>
 
-      <section className="panels" aria-label="Analytical panels">
-        {charts &&
-          PANELS.map(({ Cmp, title, sub }) => (
-            <div className="panel" key={title}>
-              <h3>{title}</h3>
-              <p className="panel-sub">{sub}</p>
-              <Cmp
-                charts={charts}
-                meta={meta}
-                selected={selected}
-                selectedValue={selectedValue}
-                onSelect={onSelect}
-                onHover={setHovered}
-              />
-            </div>
-          ))}
-      </section>
+      {isSnap && selected && profile && dists && (
+        <section className="snap-strips-section" aria-label="Per-measure health snapshot">
+          <HealthSnapshot
+            profile={profile}
+            metrics={catalog.metrics}
+            dists={dists}
+            stateMeans={stateMeans}
+            onPickMetric={(id) => setState({ view: "measure", metric: id })}
+          />
+        </section>
+      )}
+
+      {!isSnap && (
+        <section className="panels" aria-label="Analytical panels">
+          {charts &&
+            PANELS.map(({ Cmp, title, sub }) => (
+              <div className="panel" key={title}>
+                <h3>{title}</h3>
+                <p className="panel-sub">{sub}</p>
+                <Cmp charts={charts} meta={meta} selected={selected} selectedValue={selectedValue} onSelect={onSelect} onHover={setHovered} />
+              </div>
+            ))}
+        </section>
+      )}
 
       <footer className="footer">
         <p>
-          <strong>Sources.</strong> Health outcomes: CDC PLACES-style model-based small-area estimates, read
-          from the public <code>Health_Zip_converted.pmtiles</code>. Socioeconomic context (Area Deprivation
-          Index, income, education, age): <code>health_zip.parquet</code>. Both hosted publicly on Tigris and
-          read directly by the browser; no credentials are used at runtime. Built statically — the map recolors
-          via MapLibre feature-state without rebuilding the source.
+          <strong>Sources.</strong> Health outcomes: CDC PLACES-style model-based small-area estimates,
+          read from the public <code>Health_Zip_converted.pmtiles</code>. Socioeconomic context (Area
+          Deprivation Index, income, education, age): <code>health_zip.parquet</code>. The composite
+          health score is an experimental average of national percentiles across the ten measures.
         </p>
         <p>
-          <strong>Caveats.</strong> Estimates are modeled, not direct counts. ZIP/ZCTA-level associations are
-          ecological and do not describe individuals or imply causation. Generated {catalog.generated_at.slice(0, 10)}.
+          <strong>Caveats.</strong> Estimates are modeled, not direct counts. ZIP/ZCTA-level
+          associations are ecological and do not describe individuals or imply causation. Generated {catalog.generated_at.slice(0, 10)}.
         </p>
       </footer>
     </main>

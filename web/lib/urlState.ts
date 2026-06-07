@@ -5,7 +5,10 @@ import type { Mode } from "./types";
 
 // URL holds only what defines "what you're looking at" — linkable, back-button-able.
 // Transient hover stays out of the URL.
+export type View = "measure" | "snapshot";
+
 export interface AppState {
+  view: View; // "measure" = by-measure atlas, "snapshot" = by-place health snapshot
   metric: string;
   mode: Mode;
   region: string; // "us" | census region | state abbr
@@ -13,16 +16,20 @@ export interface AppState {
 }
 
 export const DEFAULTS: AppState = {
+  view: "measure",
   metric: "diabetes",
   mode: "gap",
   region: "us",
 };
 
 const MODES: Mode[] = ["rate", "gap", "percentile"];
+const VIEWS: View[] = ["measure", "snapshot"];
 
 export function decode(sp: URLSearchParams): AppState {
   const mode = sp.get("mode");
+  const view = sp.get("view");
   return {
+    view: VIEWS.includes(view as View) ? (view as View) : DEFAULTS.view,
     metric: sp.get("metric") || DEFAULTS.metric,
     mode: (MODES.includes(mode as Mode) ? (mode as Mode) : DEFAULTS.mode),
     region: sp.get("region") || DEFAULTS.region,

@@ -8,7 +8,7 @@ export interface MetricMeta {
   label: string;
   short_label: string;
   topic: string;
-  unit: "percent";
+  unit: "percent" | "percentile";
   format: string; // d3 format spec, e.g. ".1f"
   lower_is_better: boolean;
   domain: [number, number, number]; // [min, benchmark/mid, max]
@@ -164,6 +164,30 @@ export interface Region {
 export interface RegionCatalog {
   regions: Region[];
   generated_at: string;
+}
+
+// ---- snapshot ("by place") artifacts (precomputed by scripts/build-profiles.mjs) ----
+export interface MetricDistribution {
+  bins: [number, number, number][]; // [x0, x1, count]
+  benchmark: number;
+  p90: number;
+  min: number;
+  max: number;
+  lower_is_better: boolean;
+}
+export type MetricDistributions = Record<string, MetricDistribution>;
+
+// state -> metric_id -> population-weighted mean value
+export type StateSummary = Record<string, Record<string, number>>;
+
+export interface ProfileZip {
+  c: [string, string]; // [city, state]
+  pop: number;
+  comp: number | null; // composite burden percentile 0..100 (higher = more burden)
+  m: ([number, number] | null)[]; // per metric, in metric_catalog order: [value, national pct] | null
+}
+export interface ProfileShard {
+  zips: Record<string, ProfileZip>;
 }
 
 // Shared props for every analytical panel (uniform render + cross-highlight contract).

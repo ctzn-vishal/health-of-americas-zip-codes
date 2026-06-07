@@ -100,16 +100,16 @@ export default async function LandingPage() {
           <h2 id="explore-title">Search, map, and compare.</h2>
         </div>
         <div className="feature-grid">
-          <Link href="/atlas" className="feature">
+          <Link href="/atlas?view=snapshot" className="feature">
             <span className="f-icon" aria-hidden="true">
               <SearchIcon />
             </span>
             <h3>Find your ZIP</h3>
             <p>
-              Type any 5-digit ZIP to open its profile — value, national percentile, rank, and how it
-              compares to the U.S. average across every measure.
+              Type any 5-digit ZIP for its health snapshot — a composite score plus every measure
+              placed against your state and the nation, with the map zoomed to your area.
             </p>
-            <span className="f-go">Open a profile →</span>
+            <span className="f-go">Open a snapshot →</span>
           </Link>
           <Link href="/atlas" className="feature">
             <span className="f-icon" aria-hidden="true">
