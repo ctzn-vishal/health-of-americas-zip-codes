@@ -25,13 +25,19 @@ HTTPS range requests, and the precomputed JSON in `web/public/data/` is committe
 
 ## Deploy on Vercel
 
-1. Import this repository into Vercel.
-2. **Set the project's _Root Directory_ to `web`.** (Settings → General → Root Directory.) Vercel
-   then auto-detects Next.js and runs the static export build.
-3. _(Optional)_ set an environment variable **`NEXT_PUBLIC_SITE_URL`** to your final URL
+This repo ships a root [`vercel.json`](vercel.json) that builds the `web/` subdirectory and serves
+its static export — so **importing the repo and deploying works with no dashboard configuration**.
+
+1. Import this repository into Vercel and deploy. (Leave the Root Directory as the repo root.)
+2. _(Optional)_ set an environment variable **`NEXT_PUBLIC_SITE_URL`** to your final URL
    (e.g. `https://your-domain.com`). It is used for canonical links, the sitemap, and Open Graph
    tags. If unset, a sensible default is used.
-4. Deploy. No other environment variables are required at runtime.
+
+No other environment variables are required at runtime.
+
+> **Alternative:** instead of the root `vercel.json`, you can set the project's **Root Directory to
+> `web`** (Settings → General); Vercel then auto-detects Next.js. Use one approach or the other —
+> if Root Directory is `web`, the root `vercel.json` is ignored.
 
 The app is a static export (`output: "export"` → `web/out`), so it also runs on any static host.
 
