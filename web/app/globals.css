@@ -122,7 +122,9 @@ h1, h2, h3 { margin: 0; font-weight: 650; letter-spacing: -0.01em; color: var(--
   border: 1px solid var(--line-2); border-radius: var(--radius); overflow: hidden;
   background: #0b1020; box-shadow: var(--shadow);
 }
-.map-canvas { position: absolute; inset: 0; }
+/* Higher specificity than maplibre-gl.css's `.maplibregl-map { position: relative }`, which is
+   added to this same element and would otherwise collapse the container to 0 height (blank map). */
+.map-frame .map-canvas { position: absolute; inset: 0; height: auto; }
 
 .panels {
   margin-top: 22px; display: grid; gap: 18px;

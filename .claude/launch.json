@@ -8,6 +8,14 @@
       "cwd": "web",
       "port": 3000,
       "autoPort": true
+    },
+    {
+      "name": "static-out",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "out", "-l", "5050"],
+      "cwd": "web",
+      "port": 5050,
+      "autoPort": true
     }
   ]
 }

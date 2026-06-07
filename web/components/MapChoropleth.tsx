@@ -61,6 +61,11 @@ export default function MapChoropleth({
       preserveDrawingBuffer: true,
     });
     mapRef.current = map;
+    // The container can finish sizing AFTER this effect runs — notably in the static export,
+    // where the stylesheet that sizes .map-frame loads after the JS. MapLibre only auto-resizes
+    // on window resize, so without this the canvas can stay at its (too-small) initial size.
+    const ro = new ResizeObserver(() => mapRef.current?.resize());
+    if (elRef.current) ro.observe(elRef.current);
     map.on("error", (e) => console.error("[map] error:", (e as any)?.error?.message ?? e));
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
     map.addControl(
@@ -142,6 +147,7 @@ export default function MapChoropleth({
     });
 
     return () => {
+      ro.disconnect();
       map.remove();
       maplibregl.removeProtocol("pmtiles");
     };
