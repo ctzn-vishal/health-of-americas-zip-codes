@@ -1,21 +1,22 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import StorySig from "@/components/stories/StorySig";
-import { getArchetypes, getCorrelations, getGradients, getMentalHealth, getPca, getSmoking } from "@/lib/serverData";
+import { getArchetypes, getCorrelations, getGradients, getMentalHealth, getPca, getSmoking, getWealthGap } from "@/lib/serverData";
 import { STORIES, storyPath } from "@/lib/stories";
 
 export const metadata: Metadata = {
   title: "Stories — what 26 measures across 32,409 ZIP codes can teach",
   description:
-    "Precomputed analyses of the ZIP Health Atlas: the single axis behind most place-based health differences, the correlation structure of 26 measures, four community archetypes, and the deprivation gradient.",
+    "Precomputed analyses of the ZIP Health Atlas: the single axis behind most place-based health differences, the correlation structure of 26 measures, four community archetypes, wealth gaps, and the deprivation gradient.",
 };
 
 export default async function StoriesIndex() {
-  const [pca, corr, arch, grad, mh, smoke] = await Promise.all([
+  const [pca, corr, arch, grad, wealth, mh, smoke] = await Promise.all([
     getPca(),
     getCorrelations(),
     getArchetypes(),
     getGradients(),
+    getWealthGap(),
     getMentalHealth(),
     getSmoking(),
   ]);
@@ -45,6 +46,12 @@ export default async function StoriesIndex() {
       <span className="sc-stat">
         {steepest.rel?.toFixed(1)}×
         <span className="unit"> {steepest.short.toLowerCase()}, most- vs least-deprived</span>
+      </span>
+    ),
+    "wealth-gap": (
+      <span className="sc-stat">
+        {wealth.score.worse_count}/26
+        <span className="unit"> measures worse in bottom wealth decile</span>
       </span>
     ),
     "diagnosis-gap": (

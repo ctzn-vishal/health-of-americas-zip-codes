@@ -195,6 +195,14 @@ export default async function MethodsPage() {
               national-rank decile, shown relative to the least-deprived decile.
             </li>
             <li>
+              <strong>The wealth gradient</strong> (<code>data-prep/analytics_wealth.py</code>)
+              ranks complete-case ZIP/ZCTA areas with at least 500 residents on a composite
+              socioeconomic advantage score — the mean rank percentile of income, college
+              attainment, home value, reversed ADI, reversed poverty, and reversed unemployment —
+              and compares the top and bottom deciles of that score using population-weighted mean
+              prevalence.
+            </li>
+            <li>
               <strong>Outcome stories</strong> use all ZCTAs with the relevant measures (not the
               complete case). The smoking story fits a quadratic of smoking on ADI and maps the
               residual; the mental-health story uses the ratio of diagnosed depression to frequent

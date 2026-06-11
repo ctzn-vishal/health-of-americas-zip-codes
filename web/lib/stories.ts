@@ -33,6 +33,12 @@ export const STORIES: StoryDef[] = [
     dek: "Complete tooth loss is three times higher in the most-deprived tenth of neighborhoods. Binge drinking is the one measure that runs the other way.",
   },
   {
+    slug: "wealth-gap",
+    kicker: "The wealth gradient",
+    title: "The health premium of wealthy ZIP codes",
+    dek: "Rank ZIP/ZCTA areas by a composite of income, college attainment, home value, ADI, poverty, and unemployment, then compare the richest tenth with the poorest tenth across all 26 health measures.",
+  },
+  {
     slug: "diagnosis-gap",
     kicker: "Outcome story · mental health",
     title: "Distress follows poverty. Diagnosis follows privilege.",

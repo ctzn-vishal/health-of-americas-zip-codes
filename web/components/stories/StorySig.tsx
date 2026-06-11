@@ -95,6 +95,33 @@ function GradientSig() {
   );
 }
 
+function WealthGapSig() {
+  const rows = [
+    [0.18, 0.72],
+    [0.22, 0.66],
+    [0.31, 0.78],
+    [0.36, 0.58],
+    [0.44, 0.69],
+  ];
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="sc-sig" aria-hidden="true">
+      {rows.map(([top, bottom], i) => {
+        const y = 15 + i * 10;
+        const xTop = 18 + top * (W - 42);
+        const xBottom = 18 + bottom * (W - 42);
+        return (
+          <g key={i}>
+            <line x1={xTop} x2={xBottom} y1={y} y2={y} stroke="rgba(244,103,93,0.5)" strokeWidth={3} strokeLinecap="round" />
+            <circle cx={xTop} cy={y} r={3} fill="#6cb6ff" />
+            <circle cx={xBottom} cy={y} r={3} fill="#f4675d" />
+          </g>
+        );
+      })}
+      <path d="M 18 62 C 44 45, 77 40, 132 19" fill="none" stroke="#ffd166" strokeWidth={1.5} opacity={0.8} />
+    </svg>
+  );
+}
+
 function DiagnosisGapSig() {
   const rnd = mulberry32(41);
   const pts = Array.from({ length: 40 }, () => {
@@ -139,6 +166,7 @@ const SIGS: Record<string, () => React.ReactElement> = {
   connected: ConnectedSig,
   "four-americas": FourAmericasSig,
   gradient: GradientSig,
+  "wealth-gap": WealthGapSig,
   "diagnosis-gap": DiagnosisGapSig,
   "tobacco-belt": TobaccoBeltSig,
 };

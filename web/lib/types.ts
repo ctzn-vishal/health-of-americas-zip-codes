@@ -315,6 +315,68 @@ export interface GradientsPayload {
   generated_at: string;
 }
 
+export interface WealthGapPayload {
+  n: number;
+  min_population: number;
+  method: string;
+  score: {
+    definition: string;
+    bottom_cutoff: number;
+    top_cutoff: number;
+    worse_count: number;
+    reverse_count: number;
+    largest_gap_metric: string;
+    largest_gap_points: number;
+    largest_gap_ratio: number;
+  };
+  inputs: {
+    key: string;
+    label: string;
+    short: string;
+    higher_means: string;
+    unit: "dollars" | "percent" | "percentile";
+    score_direction: 1 | -1;
+  }[];
+  correlation: {
+    method: string;
+    keys: string[];
+    labels: string[];
+    higher: string[];
+    matrix: number[][];
+    score: { key: string; rho: number; aligned_rho: number }[];
+  };
+  groups: {
+    id: "bottom" | "national" | "top";
+    label: string;
+    n: number;
+    population: number;
+    score: number;
+    score_pct: number;
+    components: Record<string, { raw: number | null; score: number | null }>;
+  }[];
+  metrics: {
+    id: string;
+    label: string;
+    short: string;
+    topic: string;
+    top: number | null;
+    bottom: number | null;
+    national: number | null;
+    gap: number | null;
+    ratio: number | null;
+  }[];
+  deciles: {
+    decile: number;
+    n: number;
+    population: number;
+    score_lo: number;
+    score_hi: number;
+    score: number;
+    metrics: Record<string, number | null>;
+  }[];
+  generated_at: string;
+}
+
 export interface DotmapPayload {
   n: number;
   n_covered: number;

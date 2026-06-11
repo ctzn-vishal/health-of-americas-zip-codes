@@ -13,6 +13,7 @@ import type {
   PcaPayload,
   RegionCatalog,
   SmokingPayload,
+  WealthGapPayload,
 } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "public", "data");
@@ -51,6 +52,7 @@ export const getArchetypes = () => readJson<ArchetypesPayload>("analytics/archet
 export const getGradients = () => readJson<GradientsPayload>("analytics/gradients.json");
 export const getMentalHealth = () => readJson<MentalHealthPayload>("analytics/mental_health.json");
 export const getSmoking = () => readJson<SmokingPayload>("analytics/smoking.json");
+export const getWealthGap = () => readJson<WealthGapPayload>("analytics/wealth_gap.json");
 
 export interface LandingStats {
   nZip: number;
