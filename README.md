@@ -1,14 +1,15 @@
 # Health of America's ZIP Codes
 
-A polished, **server-rendered, map-first** atlas of U.S. health outcomes for every ZIP/ZCTA area —
-chronic, behavioral, mental, and general-health measures, each mapped against the national average
-and the neighborhood deprivation gradient.
+A polished, **server-rendered, map-first** atlas of U.S. ZIP/ZCTA health, social needs, ACS
+demographics, and neighborhood deprivation.
 
-- **31,491** ZIP/ZCTA areas · **10** health measures (5 domains) · **~297M** people in mapped areas
+- **32,409** ZIP/ZCTA rows · **32,263** current PMTiles geometries · **26** featured health and
+  social-need measures
 - A dark "civic health observatory" interface with two complementary views in the atlas:
   - **ZIP health snapshot** (by place): pick a ZIP for a composite health score plus strip-plot small
-    multiples that place it against its **state** and the **nation** across all 10 measures. The map
-    zooms to the ZIP's metro and shades areas by overall burden.
+    multiples that place it against its **state** and the **nation** across all featured measures,
+    with ACS/ADI context and per-ZIP source provenance. The map zooms to the ZIP's metro and shades
+    areas by overall burden.
   - **Explore by measure** (one outcome at a time): a luminous MapLibre + PMTiles choropleth that
     recolors via feature-state, with four D3 analytical panels and an insight rail.
 - Selecting a ZIP **zooms the map to its metro**; state is URL-shareable.
@@ -23,9 +24,13 @@ data-prep/   Python pipeline that produces web/public/data/* (run offline)
 docs/        Data contract + audit notes
 ```
 
-The deployable application is **`web/`**. The Python pipeline and large source artifacts
-(PMTiles, Parquet) are not needed at build or runtime — the map streams the public PMTiles over
-HTTPS range requests, and the precomputed JSON in `web/public/data/` is committed.
+The deployable application is **`web/`**. The Python pipeline and large source artifacts are not
+needed at app build or runtime. The map streams the public PMTiles geometry over HTTPS range
+requests, and the precomputed JSON in `web/public/data/` is committed.
+
+The current analytical source is `raw_data/zcta_atlas.parquet` plus
+`raw_data/zcta_atlas.parquet.meta.json`. All geometry-bearing ZCTAs in that parquet already exist in
+the current PMTiles, so **a new PMTiles file is not required** unless the geometry source changes.
 
 ## Deploy on Vercel
 
@@ -78,14 +83,26 @@ cd web && npm run gen:profiles   # → metric_distributions.json, state_summary.
 Re-run this after regenerating the base payloads with the Python pipeline. The outputs are committed
 and served as static assets, so each ZIP snapshot loads only a small shard at runtime.
 
+## Regenerating data payloads
+
+```bash
+python data-prep/prep_v2.py
+cd web && npm run gen:profiles
+```
+
+`prep_v2.py` reads the complete parquet and metadata, cleans ACS sentinels, derives burden-oriented
+measures, writes catalog/map/chart/insight payloads, and emits a coverage report. `gen:profiles`
+then builds profile shards, metric distributions, state summaries, and the composite burden layer.
+
 ## Tech stack
 
 Next.js 15 (App Router) · React 19 · TypeScript · MapLibre GL JS · PMTiles · D3 · static export.
 
 ## Data & caveats
 
-Health outcomes are **CDC PLACES-style model-based small-area estimates** (modeled, not direct
-counts). ZIP-level associations are **ecological** — they describe places, not individuals, and do
-not imply causation. **ZCTAs** approximate USPS ZIP Code service areas and are not official mailing
+Health outcomes are **CDC PLACES model-based small-area estimates** (modeled, not direct counts).
+Pennsylvania and Kentucky include documented tract-to-ZCTA backfill where native CDC ZCTA cells are
+absent. ZIP-level associations are **ecological** — they describe places, not individuals, and do not
+imply causation. **ZCTAs** approximate USPS ZIP Code service areas and are not official mailing
 boundaries. See [`/methods`](web/app/methods/page.tsx), [`/sources`](web/app/sources/page.tsx), and
 [`docs/data-contract.md`](docs/data-contract.md).

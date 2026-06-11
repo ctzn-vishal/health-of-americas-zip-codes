@@ -5,7 +5,7 @@ import { valueFmt, gapFmt, percentileOf, fmtPop, ordinal } from "@/lib/format";
 
 describe("urlState codec", () => {
   it("round-trips a non-default view", () => {
-    const s = { metric: "obesity_rate", mode: "rate" as const, region: "TX", selected: "79846" };
+    const s = { ...DEFAULTS, metric: "obesity", mode: "rate" as const, region: "TX", selected: "79846" };
     expect(decode(new URLSearchParams(encode(s)))).toEqual(s);
   });
   it("omits defaults from the query string", () => {

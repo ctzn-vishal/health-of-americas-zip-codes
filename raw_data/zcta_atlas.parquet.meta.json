@@ -1,0 +1,1072 @@
+{
+  "dataset_id": "zcta_atlas",
+  "stage": "analytic",
+  "life_stages": [
+    "intro"
+  ],
+  "source": {
+    "name": "zcta_atlas \u2014 combined ZIP/ZCTA geo + ACS demographics + ADI + CDC PLACES health",
+    "url": null,
+    "vintage": "Zip_All (ACS-based); ADI 2023 v4.0.1; CDC PLACES 2025",
+    "accessed_at": "2026-06-09T17:09:22+00:00",
+    "access_method": "GeoParquet: Zip_All spine (reprojected) + CDC ZCTA health (wide) + ADI ZCTA",
+    "raw_path": "data/raw/zip/Zip_All.parquet",
+    "raw_sha256_manifest": null
+  },
+  "geography": {
+    "unit": "zcta",
+    "n_rows": 32409,
+    "n_unique_geoids": 32409,
+    "national_coverage": true,
+    "missing_geoids_dropped": 0,
+    "join_key": "GEOID"
+  },
+  "interpolation": null,
+  "columns": [
+    {
+      "name": "GEOID",
+      "type": "VARCHAR",
+      "role": "key",
+      "description": "2020 ZCTA5 code, 5-char string. Joins zctas_2020.GEOID20.",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "ALAND20",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Land Area (Census): Land area in square meters (Census 2020) [sq meters]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "AWATER20",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Water Area (Census): Water area in square meters (Census 2020) [sq meters]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "county_fips",
+      "type": "VARCHAR",
+      "role": "raw",
+      "description": "County FIPS: Federal Information Processing Standard code for county",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "state_fips",
+      "type": "VARCHAR",
+      "role": "raw",
+      "description": "State FIPS: Federal Information Processing Standard code for state",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "county_name",
+      "type": "VARCHAR",
+      "role": "raw",
+      "description": "County Name: Name of county",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "state_abbr",
+      "type": "VARCHAR",
+      "role": "raw",
+      "description": "State Abbreviation: Two-letter state abbreviation",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "cbsa_code",
+      "type": "VARCHAR",
+      "role": "raw",
+      "description": "CBSA Code: Core Based Statistical Area code",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "cbsa_name",
+      "type": "VARCHAR",
+      "role": "raw",
+      "description": "CBSA Name: Core Based Statistical Area name",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "land_area_sqmi",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Land Area: Land area in square miles [sq miles]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "water_area_sqmi",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Water Area: Water area in square miles [sq miles]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "latitude",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Latitude: Geographic center latitude [degrees]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "longitude",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Longitude: Geographic center longitude [degrees]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "is_urban",
+      "type": "VARCHAR",
+      "role": "raw",
+      "description": "Is Urban: Whether the ZIP Code is urban (1) or not (0) [binary]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "is_rural",
+      "type": "VARCHAR",
+      "role": "raw",
+      "description": "Is Rural: Whether the ZIP Code is rural (1) or not (0) [binary]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "residential_ratio",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Residential Ratio: Ratio of residential address coverage [ratio]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "business_ratio",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Business Ratio: Ratio of business address coverage [ratio]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "other_ratio",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Other Ratio: Ratio of other address coverage [ratio]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "total_ratio",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Total Ratio: Ratio of total address coverage [ratio]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "per_white",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "White: Percentage of population that is white [%]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "per_unemployed",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Unemployed: Percentage of labor force that is unemployed [%]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "per_poverty",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Poverty: Percentage of population living below poverty line [%]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "per_married",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Married: Percentage of population that is married [%]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "per_hispanic",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Hispanic: Percentage of population that is Hispanic or Latino [%]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "per_hh_withkids_under18",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Households with Kids: Percentage of households with children under 18 [%]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "per_foreign_born",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Foreign Born: Percentage of population that is foreign-born [%]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "per_college_above",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "College Education: Percentage of population with college degree or higher [%]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "per_black",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Black: Percentage of population that is black [%]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "per_asian",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Asian: Percentage of population that is Asian [%]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "per_65_over",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "65 and Over: Percentage of population aged 65 and over [%]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "median_income",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Median Income: Median household income [$]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "median_gross_rent",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Median Gross Rent: Median gross rent [$]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "median_age",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Median Age: Median age of residents [years]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "hh_size",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Household Size: Average household size [people]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "racial_diversity_index",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Racial Diversity Index: Gini-Simpson index for racial diversity [index]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "gini",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Income Inequality: Gini coefficient for income inequality [index]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "avg_commute_time",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Average Commute Time: Average commute time to work [minutes]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "population",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Population: Total population [people]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "population_density",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Population Density: Population per square mile [people/sq mi]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "median_home_value",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "Median Home Value: Median value of owner-occupied housing units [$]",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "adi_national_rank",
+      "type": "DOUBLE",
+      "role": "derived",
+      "description": "Neighborhood Atlas ADI national percentile, area-aggregated to ZCTA (v4.0.1, 2023). Replaces the source file's unsourced ADI.",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percentile_1_100"
+    },
+    {
+      "name": "adi_state_decile",
+      "type": "DOUBLE",
+      "role": "derived",
+      "description": "Neighborhood Atlas ADI state decile, area-aggregated to ZCTA.",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "decile_1_10"
+    },
+    {
+      "name": "health_access2",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Health Insurance (Prevention). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_arthritis",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Arthritis (Health Outcomes). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_binge",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Binge Drinking (Health Risk Behaviors). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_bphigh",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: High Blood Pressure (Health Outcomes). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_bpmed",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: High Blood Pressure Medication (Prevention). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_cancer",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Cancer (non-skin) or Melanoma (Health Outcomes). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_casthma",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Current Asthma (Health Outcomes). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_chd",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Coronary Heart Disease (Health Outcomes). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_checkup",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Annual Checkup (Prevention). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_cholscreen",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Cholesterol Screening (Prevention). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_cognition",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Cognitive Disability (Disability). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_colon_screen",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Colorectal Cancer Screening (Prevention). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_copd",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: COPD (Health Outcomes). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_csmoking",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Current Cigarette Smoking (Health Risk Behaviors). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_dental",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Dental Visit (Prevention). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_depression",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Depression (Health Outcomes). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_diabetes",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Diabetes (Health Outcomes). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_disability",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Any Disability (Disability). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_emotionspt",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Lack of Social/Emotional Support (Health-Related Social Needs). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_foodinsecu",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Food Insecurity (Health-Related Social Needs). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_foodstamp",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Food Stamps (Health-Related Social Needs). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_ghlth",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: General Health (Health Status). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_hearing",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Hearing Disability (Disability). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_highchol",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: High Cholesterol (Health Outcomes). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_housinsecu",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Housing Insecurity (Health-Related Social Needs). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_indeplive",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Independent Living Disability (Disability). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_lacktrpt",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Transportation Barriers (Health-Related Social Needs). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_loneliness",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Loneliness (Health-Related Social Needs). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_lpa",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Physical Inactivity (Health Risk Behaviors). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_mammouse",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Mammography (Prevention). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_mhlth",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Frequent Mental Distress (Health Status). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_mobility",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Mobility Disability (Disability). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_obesity",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Obesity (Health Outcomes). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_phlth",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Frequent Physical Distress (Health Status). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_selfcare",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Self-care Disability (Disability). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_shututility",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Utility Services Threat (Health-Related Social Needs). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_sleep",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Short Sleep Duration (Health Risk Behaviors). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_stroke",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Stroke (Health Outcomes). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_teethlost",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: All Teeth Lost (Health Outcomes). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_vision",
+      "type": "DOUBLE",
+      "role": "raw",
+      "description": "PLACES crude prevalence: Vision Disability (Disability). Native ZCTA estimate where available, else population-weighted tract->ZCTA aggregate (see health_source).",
+      "formula": null,
+      "source_tables": [
+        "CDC PLACES ZCTA 2025 (native) / tract 2024 (backfill)"
+      ],
+      "moe_column": null,
+      "moe_method": null,
+      "unit": "percent_0_100"
+    },
+    {
+      "name": "health_n_measures",
+      "type": "INTEGER",
+      "role": "metadata",
+      "description": "Count of non-null health_* measures for this ZCTA after backfill (0-40).",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "health_n_backfilled",
+      "type": "INTEGER",
+      "role": "metadata",
+      "description": "How many health_* measures were filled from the tract->ZCTA aggregate (0 = all native CDC ZCTA).",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "health_source",
+      "type": "VARCHAR",
+      "role": "metadata",
+      "description": "Health provenance: 'native' (all from CDC ZCTA), 'mixed' (some backfilled), 'aggregated' (all from tract), 'none' (no health). PA/KY are mostly 'mixed'/'aggregated' due to the CDC ZCTA gap.",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    },
+    {
+      "name": "geometry",
+      "type": "GEOMETRY",
+      "role": "geometry",
+      "description": "ZCTA polygon boundary, WGS84 (EPSG:4326), reprojected from source NAD83.",
+      "formula": null,
+      "source_tables": null,
+      "moe_column": null,
+      "moe_method": null,
+      "unit": null
+    }
+  ],
+  "limitations": [
+    "Grain: one row per ZCTA from Zip_All (32,409). 32,306 resolve to the TIGER zctas_2020 geo file.",
+    "Coverage (non-null of 32,409): ACS demographics 32,409; ADI 32,193; PLACES health 32,304.",
+    "The source file's older *_zip health columns were DROPPED and replaced by the 2025 CDC PLACES ZCTA release (with confidence intervals; long file at data/staged/health/places_zcta_latest.parquet).",
+    "CDC's ZCTA file provides only ~5 of 40 measures for Pennsylvania and Kentucky ZCTAs (a CDC source-side restriction affecting ONLY those two states). Null health cells are backfilled with a population-weighted tract->ZCTA aggregate from the complete tract PLACES file. Per-row provenance is in health_source / health_n_backfilled. Backfilled values are aggregates (no native ZCTA confidence intervals).",
+    "Residual unfillable gaps (left NULL, not imputed): PA's 6 health-related-social-needs measures (FOODSTAMP, FOODINSECU, HOUSINSECU, LACKTRPT, EMOTIONSPT, SHUTUTILITY) are absent from CDC PLACES at every geography for PA, so there is no source to backfill; LONELINESS exists only in the 2025 ZCTA file (not the 2024 tract file), so it cannot be backfilled for any ZCTA missing it natively (affects PA & KY). After backfill PA averages 33/40 and KY 39/40 measures; no ZCTA is fully empty.",
+    "The source file's own `ADI` column (unknown provenance) was DROPPED and replaced by the canonical Neighborhood Atlas v4.0.1 ADI, area-aggregated to ZCTA (an approximation; see adi_atlas_zcta_2023 sidecar).",
+    "ACS demographic definitions are carried verbatim from the Zip_All source metadata; they were computed upstream (not by zcd derivations) \u2014 exact ACS table provenance is not in that metadata.",
+    "ZIP-code geography from the source approximates ZCTAs; it is NOT the tract spine dim_geo. Validate against zctas_2020, not dim_geo.",
+    "Geometry reprojected NAD83 (4269) -> WGS84 (4326). 146 ZIPs (~0.45%) have NULL geometry in the source (point/PO-box ZIPs without a ZCTA polygon); their attribute rows are retained."
+  ],
+  "license": "Composite: ACS (public domain), CDC PLACES (public domain), Neighborhood Atlas (non-commercial).",
+  "citation": "Composite ZCTA analytic table for The ZIP Code Destiny. Sources: ACS-derived ZIP demographics (Zip_All); CDC PLACES ZCTA 2025; Neighborhood Atlas ADI v4.0.1 (2023).",
+  "code": {
+    "acquire_script": null,
+    "stage_script": "python/zcd/analytic/zcta_atlas.py",
+    "git_commit": null
+  },
+  "schema_version": "1.0"
+}

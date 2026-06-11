@@ -16,8 +16,27 @@ export const getMetricCatalog = () => readJson<MetricCatalog>("metric_catalog.js
 export const getRegionCatalog = () => readJson<RegionCatalog>("region_catalog.json");
 export const getCharts = (metric: string) => readJson<ChartsPayload>(`charts/${metric}.json`);
 
+export interface CoverageReport {
+  generated_at: string;
+  source_vintage?: string;
+  source_limitations?: string[];
+  rows?: {
+    n_rows?: number;
+    n_with_geometry?: number;
+    n_without_geometry?: number;
+    n_native?: number;
+    n_mixed?: number;
+    n_aggregated?: number;
+    n_no_health?: number;
+    total_backfilled_cells?: number;
+  };
+}
+
+export const getCoverageReport = () => readJson<CoverageReport>("coverage_report.json");
+
 export interface LandingStats {
   nZip: number;
+  nMappableZip: number;
   nMetrics: number;
   nStates: number;
   totalPopulation: number;
@@ -31,7 +50,7 @@ export interface LandingStats {
 
 /** Assemble the handful of figures the hero + sections quote, from the real payloads. */
 export async function getLandingStats(): Promise<LandingStats> {
-  const [catalog, regions] = await Promise.all([getMetricCatalog(), getRegionCatalog()]);
+  const [catalog, regions, coverage] = await Promise.all([getMetricCatalog(), getRegionCatalog(), getCoverageReport()]);
   const def =
     catalog.metrics.find((m) => m.metric_id === catalog.default_metric) ?? catalog.metrics[0];
   const charts = await getCharts(def.metric_id);
@@ -40,7 +59,8 @@ export async function getLandingStats(): Promise<LandingStats> {
   const adiGapPts = charts.disparity_gradient?.top_minus_bottom ?? null;
   void grad;
   return {
-    nZip: def.n_zip,
+    nZip: coverage.rows?.n_rows ?? def.n_zip + def.missing_count,
+    nMappableZip: coverage.rows?.n_with_geometry ?? def.n_zip,
     nMetrics: catalog.metrics.length,
     nStates,
     totalPopulation: charts.summary.total_population,

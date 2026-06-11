@@ -72,7 +72,7 @@ export default function MapChoropleth({
       new maplibregl.AttributionControl({
         compact: true,
         customAttribution:
-          "Health: CDC PLACES (via Health_Zip PMTiles) · Context: health_zip.parquet · Tiles © OpenMapTiles",
+          "Health: CDC PLACES 2025 · Context: ACS/ADI · Geometry: Health_Zip PMTiles · Tiles © OpenMapTiles",
       }),
       "bottom-right",
     );

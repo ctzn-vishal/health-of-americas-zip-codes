@@ -143,8 +143,8 @@ export default function AppClient() {
     return <main className="app"><p className="muted" style={{ padding: 40 }}>Loading the atlas…</p></main>;
   }
 
-  const placeOf = (rec?: GeoCatalog["zips"][string]) => (rec ? `${rec[0]}, ${rec[1]}` : "");
-  const stateMeans = profile && stateSummary ? stateSummary[profile.c[1]] : undefined;
+  const placeOf = (rec?: GeoCatalog["zips"][string]) => (rec ? [rec[0], rec[1]].filter(Boolean).join(", ") : "");
+  const stateMeans = profile?.c[1] && stateSummary ? stateSummary[profile.c[1]] : undefined;
 
   return (
     <main id="main" className="app">
@@ -153,8 +153,8 @@ export default function AppClient() {
         <h1>{isSnap ? "A health snapshot for any ZIP code" : "U.S. health outcomes, ZIP code by ZIP code"}</h1>
         <p className="sub">
           {isSnap
-            ? `Pick a ZIP code to see where it lands on every measure — against its state and the nation — with one composite health score. Estimates are modeled; associations are ecological, not causal.`
-            : `Ten health measures across 31,491 ZIP codes — mapped against the national average and against neighborhood deprivation. Estimates are modeled (CDC PLACES-style); associations are ecological, not causal.`}
+            ? `Pick a ZIP code to see where it lands across ${catalog.metrics.length} health and social-need measures, with ACS demographics, ADI context, and one experimental composite score.`
+            : `${catalog.metrics.length} burden-oriented measures across 32,409 ZIP/ZCTA areas — mapped against the national average, neighborhood deprivation, and local demographic context.`}
         </p>
       </header>
 
@@ -222,8 +222,8 @@ export default function AppClient() {
           </div>
           <p className="muted" style={{ fontSize: 12.5, marginTop: 8 }}>
             {isSnap
-              ? "Shaded by overall health burden — deeper red means higher combined burden across all measures. Hover a ZIP for its percentile; click for its full snapshot."
-              : <>Hover a ZIP for its value; click to pin it. {meta.description}. Denominator: {meta.denominator}.{meta.missing_count > 0 ? ` ${meta.missing_count.toLocaleString()} ZIPs have no estimate (shown grey).` : ""}</>}
+              ? "Shaded by overall health burden — deeper red means higher combined burden across available measures. Hover a ZIP for its percentile; click for its full snapshot."
+              : <>Hover a ZIP for its value; click to pin it. {meta.description}. Denominator: {meta.denominator}.{meta.missing_count > 0 ? ` ${meta.missing_count.toLocaleString()} ZIP/ZCTA rows have no estimate for this measure and draw as no-data where they are in the tiles.` : ""}</>}
           </p>
         </div>
 
@@ -236,8 +236,7 @@ export default function AppClient() {
                 <h2>See any ZIP&apos;s health snapshot</h2>
                 <p className="muted">
                   Search a ZIP code above, or click any area on the map, to see how it compares across
-                  all {catalog.metrics.length} measures — against its state and the nation — with one
-                  composite health score.
+                  all {catalog.metrics.length} measures, ACS context, state averages, and the nation.
                 </p>
                 {selected && !profile && <p className="muted">Loading ZIP {selected}…</p>}
               </div>
@@ -246,7 +245,21 @@ export default function AppClient() {
             <>
               {selected && (
                 <div style={{ marginBottom: 12 }}>
-                  <ZipCard zip={selected} place={placeOf(geoRec)} region={geoRec?.[2]} population={geoRec?.[5]} meta={meta} value={selectedValue} percentile={selectedPct} onClear={() => onSelect(null)} />
+                  <ZipCard
+                    zip={selected}
+                    place={placeOf(geoRec)}
+                    region={geoRec?.[2] ?? undefined}
+                    population={geoRec?.[5]}
+                    county={geoRec?.[6]}
+                    source={geoRec?.[8]}
+                    backfilled={geoRec?.[10]}
+                    adi={geoRec?.[11]}
+                    income={geoRec?.[12]}
+                    meta={meta}
+                    value={selectedValue}
+                    percentile={selectedPct}
+                    onClear={() => onSelect(null)}
+                  />
                 </div>
               )}
               {insights && <InsightRail insights={insights.insights} onSelect={onSelect} metricLabel={meta.label} />}
@@ -283,12 +296,13 @@ export default function AppClient() {
       <footer className="footer">
         <p>
           <strong>Sources.</strong> Health outcomes: CDC PLACES-style model-based small-area estimates,
-          read from the public <code>Health_Zip_converted.pmtiles</code>. Socioeconomic context (Area
-          Deprivation Index, income, education, age): <code>health_zip.parquet</code>. The composite
-          health score is an experimental average of national percentiles across the ten measures.
+          prepared from <code>zcta_atlas.parquet</code> and joined to public PMTiles geometry. Socioeconomic
+          context includes ACS demographics and ADI 2023 v4.0.1. The composite health score is an
+          experimental average of national percentiles across available measures.
         </p>
         <p>
-          <strong>Caveats.</strong> Estimates are modeled, not direct counts. ZIP/ZCTA-level
+          <strong>Caveats.</strong> Estimates are modeled, not direct counts. Pennsylvania and Kentucky
+          include documented tract-to-ZCTA backfill where native CDC ZCTA cells are absent. ZIP/ZCTA-level
           associations are ecological and do not describe individuals or imply causation. Generated {catalog.generated_at.slice(0, 10)}.
         </p>
       </footer>

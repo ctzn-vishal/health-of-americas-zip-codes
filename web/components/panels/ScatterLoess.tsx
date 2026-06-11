@@ -245,7 +245,7 @@ export default function ScatterLoess({
               fontSize={11}
               fill="var(--ink-2)"
             >
-              Area Deprivation Index (higher = more deprived)
+              ADI national rank (higher = more deprived)
             </text>
             <text
               transform={`translate(${-CHART_M.l + 12},${innerH / 2}) rotate(-90)`}

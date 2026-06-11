@@ -5,6 +5,9 @@
 # local, machine-specific Claude Code settings
 .claude/settings.local.json
 
+# raw analytical source (642MB — exceeds GitHub limits; build-side only, see docs/data-contract.md)
+raw_data/*.parquet
+
 # extracted skill bundle + local pmtiles copy (large, re-downloadable)
 _extracted/
 claude-dataviz-marketplace.zip

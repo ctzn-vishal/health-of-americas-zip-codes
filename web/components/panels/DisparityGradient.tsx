@@ -258,7 +258,7 @@ export default function DisparityGradient({ charts, meta }: PanelProps) {
                 fontWeight={600}
                 fill="var(--ink-2)"
               >
-                Area Deprivation decile (1 = least deprived → 10 = most deprived)
+                ADI rank decile (1 = least deprived → 10 = most deprived)
               </text>
             </g>
 

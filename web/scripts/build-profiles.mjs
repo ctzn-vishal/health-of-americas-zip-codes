@@ -4,7 +4,7 @@
 // Emits:
 //   public/data/metric_distributions.json   {metric: {bins:[[x0,x1,count]], benchmark, p90, min, max, lower_is_better}}
 //   public/data/state_summary.json          {state: {metric: popWeightedMean}}
-//   public/data/profiles/{zip2}.json        {zips: {zip: {c:[city,state], pop, comp, m:{metric:[value, natPct]}}}}
+//   public/data/profiles/{zip2}.json        {zips: {zip: {c:[place,state], pop, comp, q, x, m:{metric:[value,natPct]}}}}
 //   public/data/map_values/composite.json   MapValues-shaped layer of the composite burden percentile
 //
 // Run from web/:  node scripts/build-profiles.mjs
@@ -21,7 +21,7 @@ const round = (v, d = 1) => {
 };
 
 const catalog = read("metric_catalog.json");
-const geo = read("geo_catalog.json"); // {zips: {zip: [city, state, region, lat, lon, pop]}}
+const geo = read("geo_catalog.json"); // compact tuple; see geo_catalog.fields
 const metrics = catalog.metrics.map((m) => m.metric_id);
 
 // ---- load all map_values + national sorted arrays for exact percentiles ----
@@ -98,6 +98,7 @@ const agg = {}; // state -> metric -> {sw, w}
 for (const z of zips) {
   const g = geo.zips[z];
   const st = g[1];
+  if (!st) continue;
   const pop = g[5] || 0;
   (agg[st] ||= {});
   for (const met of metrics) {
@@ -141,7 +142,16 @@ for (const z of zips) {
   const g = geo.zips[z];
   const key = z.slice(0, 2);
   (shards[key] ||= { zips: {} });
-  shards[key].zips[z] = { c: [g[0], g[1]], pop: g[5], comp: compPct[z], m: perZip[z] };
+  shards[key].zips[z] = {
+    c: [g[0], g[1]],
+    pop: g[5],
+    comp: compPct[z],
+    // q = health/provenance quality tuple: [source, n_measures, n_backfilled, has_geometry]
+    q: [g[8] ?? "none", g[9] ?? 0, g[10] ?? 0, g[19] ?? true],
+    // x = compact context tuple: [ADI, income, poverty, college, Black, Hispanic, 65+, urban]
+    x: [g[11] ?? null, g[12] ?? null, g[13] ?? null, g[14] ?? null, g[15] ?? null, g[16] ?? null, g[17] ?? null, g[18] ?? null],
+    m: perZip[z],
+  };
 }
 for (const k of Object.keys(shards)) write(`profiles/${k}.json`, shards[k]);
 

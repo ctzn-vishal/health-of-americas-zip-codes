@@ -14,11 +14,11 @@ async function settle(page: Page) {
 }
 
 const views = [
-  { name: "diabetes-gap", url: "/?metric=diabetes&mode=gap" },
-  { name: "diabetes-rate", url: "/?metric=diabetes&mode=rate" },
-  { name: "obesity-percentile", url: "/?metric=obesity_rate&mode=percentile" },
-  { name: "selected-90011", url: "/?metric=diabetes&mode=gap&selected=90011" },
-  { name: "invalid-metric", url: "/?metric=bogus_metric" },
+  { name: "diabetes-gap", url: "/atlas?metric=diabetes&mode=gap" },
+  { name: "diabetes-rate", url: "/atlas?metric=diabetes&mode=rate" },
+  { name: "obesity-percentile", url: "/atlas?metric=obesity&mode=percentile" },
+  { name: "selected-90011", url: "/atlas?metric=diabetes&mode=gap&selected=90011" },
+  { name: "invalid-metric", url: "/atlas?metric=bogus_metric" },
 ];
 
 for (const v of views) {
@@ -31,18 +31,18 @@ for (const v of views) {
 
 test("visual: mobile portrait", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/?metric=diabetes&mode=gap");
+  await page.goto("/atlas?metric=diabetes&mode=gap");
   await settle(page);
   await expect(page).toHaveScreenshot("mobile-diabetes.png", { mask: MASK(page), fullPage: true });
 });
 
 test("e2e: metric + mode + selection round-trip via URL", async ({ page }) => {
-  await page.goto("/?metric=diabetes&mode=gap");
+  await page.goto("/atlas?metric=diabetes&mode=gap");
   await settle(page);
 
   // change metric -> URL + legend update
-  await page.selectOption("#metric-select", "obesity_rate");
-  await expect(page).toHaveURL(/metric=obesity_rate/);
+  await page.selectOption("#metric-select", "obesity");
+  await expect(page).toHaveURL(/metric=obesity/);
   await expect(page.locator(".legend .legend-title")).toContainText("Obesity");
 
   // toggle mode -> URL update + aria-pressed
@@ -61,7 +61,7 @@ test("e2e: metric + mode + selection round-trip via URL", async ({ page }) => {
 });
 
 test("a11y: every panel has a table fallback and values without hover", async ({ page }) => {
-  await page.goto("/?metric=diabetes&mode=gap");
+  await page.goto("/atlas?metric=diabetes&mode=gap");
   await settle(page);
   await expect(page.locator(".panel details.table-fallback")).toHaveCount(4);
   // direct value labels are present in the DOM (not hover-only)

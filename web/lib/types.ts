@@ -21,8 +21,10 @@ export interface MetricMeta {
   source: string;
   source_url: string;
   source_from: "tiles" | "parquet";
+  source_column?: string;
   source_year: number | null;
   vintage_note: string;
+  provenance_note?: string;
   confidence_interval_available: boolean;
   suppression_rule: string;
   missingness_note: string;
@@ -30,13 +32,17 @@ export interface MetricMeta {
   missing_count: number;
   value_min: number;
   value_max: number;
+  native_rows?: number;
+  mixed_rows?: number;
+  aggregated_rows?: number;
+  no_geometry_rows?: number;
 }
 
 export interface MetricCatalog {
   metrics: MetricMeta[];
   default_metric: string;
   generated_at: string;
-  sources: { pmtiles: string; parquet: string };
+  sources: { pmtiles: string; parquet: string; metadata?: string };
 }
 
 export interface MapValues {
@@ -145,8 +151,31 @@ export interface InsightsPayload {
   generated_at: string;
 }
 
-// geo_catalog: compact [city, state, region, lat, lon, pop]
-export type GeoRecord = [string, string, string, number, number, number];
+// geo_catalog compact tuple, field names are carried by payload.fields.
+// V2 extends the original [city, state, region, lat, lon, pop] with county,
+// provenance, and demographic context while preserving the first six slots.
+export type GeoRecord = [
+  string,
+  string | null,
+  string | null,
+  number,
+  number,
+  number,
+  (string | null)?,
+  (string | null)?,
+  string?,
+  number?,
+  number?,
+  (number | null)?,
+  (number | null)?,
+  (number | null)?,
+  (number | null)?,
+  (number | null)?,
+  (number | null)?,
+  (number | null)?,
+  (boolean | null)?,
+  (boolean | null)?,
+];
 export interface GeoCatalog {
   fields: string[];
   zips: Record<string, GeoRecord>;
@@ -181,9 +210,20 @@ export type MetricDistributions = Record<string, MetricDistribution>;
 export type StateSummary = Record<string, Record<string, number>>;
 
 export interface ProfileZip {
-  c: [string, string]; // [city, state]
+  c: [string, string | null]; // [city, state]
   pop: number;
   comp: number | null; // composite burden percentile 0..100 (higher = more burden)
+  q?: [string, number, number, boolean]; // [health_source, health_n_measures, health_n_backfilled, has_geometry]
+  x?: [
+    number | null,
+    number | null,
+    number | null,
+    number | null,
+    number | null,
+    number | null,
+    number | null,
+    boolean | null,
+  ]; // [ADI, income, poverty, college, Black, Hispanic, 65+, urban]
   m: ([number, number] | null)[]; // per metric, in metric_catalog order: [value, national pct] | null
 }
 export interface ProfileShard {

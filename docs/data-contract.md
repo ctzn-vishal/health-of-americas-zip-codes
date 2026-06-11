@@ -1,90 +1,116 @@
-# Data Contract — ZIP Health Atlas
+# Data Contract - ZIP Health Atlas v2
 
-> Single source of truth between `data-prep/` and `web/`. Produced from the Phase 0
-> data audit (`data-prep/recon_parquet.json`, `recon_pmtiles.json`, `recon_join.json`).
-> Generated artifacts live in `web/public/data/`.
+Single source of truth between `data-prep/` and `web/`. Generated artifacts live in
+`web/public/data/` and are served as static assets.
 
-## Sources (public, range-request hosted — read directly, never re-hosted)
-| Source | URL | Role |
+## Sources
+
+| Source | Location | Role |
 |---|---|---|
-| PMTiles | `https://ontopic-public-data.t3.tigrisfiles.io/pmtiles/Health_Zip_converted.pmtiles` | Geometry **+ 15 baked health outcomes** |
-| Parquet | `https://ontopic-public-data.t3.tigrisfiles.io/sample-data/health_zip.parquet` | Socioeconomic **context** + 2 behavioral outcomes + identity/centroids |
+| Raw parquet | `raw_data/zcta_atlas.parquet` | Build-time analytical source: ZCTA identity, centroids, health measures, ACS context, ADI, and provenance |
+| Metadata | `raw_data/zcta_atlas.parquet.meta.json` | Source metadata, vintage, and limitations consumed by the prep pipeline |
+| PMTiles | `https://ontopic-public-data.t3.tigrisfiles.io/pmtiles/Health_Zip_converted.pmtiles` | Runtime ZCTA geometry streamed by MapLibre |
 
-S3 equivalents (used at build time with `.env` creds): `s3://ontopic-public-data/...`.
-**Credentials never leave the build.** The browser only ever sees the public PMTiles URL and the generated JSON.
+The browser does not read the parquet. It reads static JSON payloads plus PMTiles geometry.
 
-## KEY FINDING (deviation from the original assumption)
-The brief assumed 6–10 health outcomes would be **parquet columns**. The audit shows otherwise:
-- The parquet's only health *outcomes* are `obesity_rate` and `smoking_rate`; its other 32 columns are
-  geography, identity, and **socioeconomic context** (ADI, income, poverty, education, race, age…).
-- The **15 chronic / mental / physical health outcomes live in the PMTiles** feature properties
-  (`*_zip`), layer `zipcode_demographics`.
+## Geometry finding
 
-Resolution (honest reading of the actual data): **health outcomes come from the PMTiles** (extracted to
-`data-prep/tile_health.parquet` by decoding all 16,386 tiles), **disparity context comes from the parquet**,
-joined on ZIP. This preserves the GOAL ("U.S. ZIP-code health") with maximal signal.
+The updated parquet has 32,409 unique ZCTA rows. Of these, 32,263 have geometry and all 32,263 are
+already present in the current PMTiles layer. The remaining 146 rows have no geometry in the source
+and cannot be clicked on the map.
 
-## Grain & join
-- Analytical grain: **ZIP / ZCTA**, one row per ZIP (no time dimension — single cross-section).
-- Join key: **`zip`** — zero-padded 5-char STRING on both sides.
-  - Parquet: `lpad(CAST(location_id AS VARCHAR), 5, '0')` (stored as INTEGER, leading zeros stripped).
-  - PMTiles: `zip_code` property is already a 5-char string (e.g. `"02568"`).
-- PMTiles: layer **`zipcode_demographics`**, **promoteId = `zip_code`**, zoom **0–10**,
-  bounds `[-176.70, 18.91, -66.93, 71.34]` (incl. AK/HI/territories).
-- Join cardinality: parquet 31,634 · tiles 32,263 · **overlap 31,491 (99.55% of parquet)** ·
-  parquet-only 143 · tile-only 772 · **no duplicate ZIPs on either side**.
+**Current conclusion:** no new PMTiles file is required for v2. Rebuild PMTiles only if a future data
+release adds geometry-bearing ZCTAs not present in `Health_Zip_converted.pmtiles`, or if the map layer
+schema/key changes.
 
-## Regions (URL `region`; default `us`)
-National atlas. `us` = contiguous-US default extent `[-125, 24, -66.5, 49.5]`; full extent includes AK/HI.
-Also filterable by the 4 census `region` values and by `state_abbreviation` (50). Per-ZIP centroids come
-from parquet `latitude`/`longitude`; region/state bounds are derived in prep → `geo_catalog`/`region_catalog`.
+## Grain and join
 
-## Metrics → `metric_catalog.json` (10 featured, spanning chronic / behavioral / mental / physical / access)
-Domains = `[p2, population-weighted national mean (= benchmark / diverging midpoint), p98]`. All are
-percentages; **all `lower_is_better = true`**. Benchmark = population-weighted national mean.
+- Analytical grain: one row per ZIP/ZCTA, no time dimension.
+- Join key: zero-padded 5-character ZIP/ZCTA string.
+- PMTiles layer: `zipcode_demographics`.
+- PMTiles feature id: `zip_code`.
+- Runtime join: `web/public/data/map_values/{metric}.json` values are pushed to PMTiles features by
+  feature-state; the vector source is not rebuilt when metrics change.
 
-Values below are the **actual emitted `metric_catalog.json`** (regenerate this table from it if prep changes).
+## Featured measures
 
-| metric_id | label | source | unit | domain [min,mid,max] | benchmark | suppression |
-|---|---|---|---|---|---|---|
-| `diabetes`*default* | Diabetes | pmtiles | % | [5.7, 10.6, 19.0] | 10.61 | none (100% cov) |
-| `bphigh` | High blood pressure | pmtiles | % | [21.0, 31.7, 48.9] | 31.73 | none |
-| `chd` | Coronary heart disease | pmtiles | % | [3.1, 5.9, 11.3] | 5.87 | none |
-| `copd` | COPD | pmtiles | % | [3.5, 6.9, 14.1] | 6.90 | none |
-| `obesity_rate` | Obesity | parquet | % | [21.6, 32.2, 45.2] | 32.23 | none |
-| `smoking_rate` | Smoking | parquet | % | [9.5, 17.6, 30.8] | 17.58 | none |
-| `depression` | Depression | pmtiles | % | [14.9, 20.6, 29.4] | 20.58 | none |
-| `mhlth` | Frequent poor mental health | pmtiles | % | [10.1, 15.0, 22.5] | 15.05 | none |
-| `ghlth` | Fair or poor health | pmtiles | % | [10.4, 19.5, 35.1] | 19.48 | none |
-| `teethlost` | All teeth lost (65+) | pmtiles | % | [6.1, 14.6, 31.9] | 14.57 | **value < 0 → missing (−1 sentinel, 161 ZIPs)** |
+`metric_catalog.json` currently exposes 26 burden-oriented measures. All are framed so lower is
+better:
 
-Only `teethlost` carries the −1 missing sentinel; every other metric is 100% covered across the 31,491 joined ZIPs.
-Also present in source but **not surfaced in v1**: `arthritis, cancer, casthma, highchol, kidney, phlth, stroke`.
+- Chronic and general health: diabetes, high blood pressure, coronary heart disease, stroke, COPD,
+  cancer, all teeth lost, fair/poor health, disability.
+- Mental and physical health: depression, frequent poor mental health, frequent poor physical health.
+- Behavioral risk: obesity, smoking, physical inactivity, short sleep, binge drinking.
+- Access and prevention gaps: uninsured, no dental visit, no routine checkup.
+- Health-related social needs: food insecurity, housing insecurity, transportation barriers, low
+  social support, loneliness, utility shutoff threat.
 
-## Context variables → `context` (parquet; for scatter / disparity / correlation)
-`area_deprivation_index` (headline disparity axis; mean 100, range 10–215, ~0.96% null),
-`median_income` (6.6% null), `percent_poverty`, `percent_college_graduated`, `percent_unemployed`,
-`percent_over_65` (age confounder), `population`, `population_density`. Default context = `area_deprivation_index`.
+Prevention measures are converted to burden-oriented gaps:
 
-## Precomputed analytics to emit
-- [x] `metric_catalog.json`, `geo_catalog.json` (centroids + bounds), `region_catalog.json`
-- [x] `map_values/{metric}.json` — `{join_key, domain, benchmark, values:{zip:value}}` (feeds feature-state)
-- [x] `charts/{metric}.json` — ranked, distribution (histogram bins), correlations (Spearman vs context),
-      disparity gradient (population-weighted mean by ADI decile + 95% CI)
-- [x] `insights/{metric}.json` — validated source-backed claim bank
-- [x] Every payload stamped `source`, `source_year`, `generated_at`
+- `no_dental_visit = 100 - health_dental`
+- `no_checkup = 100 - health_checkup`
 
-## Rendering model → STATIC export
-- **Choice: static export** (`output: 'export'`). Rationale: curated single cross-section, public data,
-  payloads bake cleanly and small. **Guard:** largest `map_values` payload ≈ 31,491 entries ≈ **~0.45 MB**,
-  far under the 3 MB threshold → stay fully static (no on-demand fetch needed).
-- Where payloads land: `web/public/data/` (served as static assets); PMTiles streamed via MapLibre range
-  requests directly from the public Tigris URL.
-- Secret handling: **server/build-side only**; never imported into `web/`.
+## Context variables
 
-## Honesty caveats (surface in UI)
-- Health outcomes are **CDC PLACES-style model-based small-area estimates** (modeled, not direct counts);
-  treat as crude prevalence. Age-adjustment cannot be confirmed from the tiles — labeled as estimated prevalence.
-- **Ecological**: ZIP-level associations are not individual-level; correlations are **Spearman, not causal**.
-- `teethlost` carries a −1 missing sentinel (handled); ADI/income have minor missingness (reported in UI).
-- 143 parquet ZIPs lack tile geometry/health; 772 tile ZIPs lack parquet context → shown as no-data where relevant.
+The profile and analytics payloads carry ACS/ADI context:
+
+- ADI national rank
+- median household income
+- poverty
+- college attainment
+- Black population share
+- Hispanic population share
+- age 65+ population share
+- urban/rural flag
+
+These are used in the ZIP snapshot context band, correlation summaries, scatter panel, and ADI
+decile gradient.
+
+## Provenance
+
+The parquet carries row-level health provenance:
+
+- `health_source`: `native`, `mixed`, `aggregated`, or `none`
+- `health_n_measures`
+- `health_n_backfilled`
+
+Pennsylvania and Kentucky have CDC source-side ZCTA gaps. Where native ZCTA estimates are absent and
+tract PLACES estimates are available, the prep pipeline uses a population-weighted tract-to-ZCTA
+aggregate. Backfilled values improve coverage but are not native CDC ZCTA estimates and do not carry
+native ZCTA confidence intervals.
+
+## Generated payloads
+
+- `metric_catalog.json`: metric metadata, domains, benchmarks, coverage, and provenance counts.
+- `context_catalog.json`: context variable metadata.
+- `coverage_report.json`: row counts, geometry coverage, health provenance totals, and source
+  limitations.
+- `geo_catalog.json`: compact ZIP/ZCTA lookup preserving the first six fields
+  `[place, state, region, lat, lon, population]`, then county/provenance/context fields.
+- `region_catalog.json`: national, census-region, and state bounds.
+- `map_values/{metric}.json`: feature-state values for map rendering.
+- `charts/{metric}.json`: ranked places, distribution, ADI gradient, scatter/LOESS, and correlations.
+- `insights/{metric}.json`: source-backed claim bank for the insight rail.
+- `profiles/{zip2}.json`: compact per-ZIP snapshot shards.
+- `metric_distributions.json`, `state_summary.json`, `map_values/composite.json`: snapshot support
+  artifacts generated by `web/scripts/build-profiles.mjs`.
+
+## Static rendering model
+
+The app stays a static export. Largest per-metric map payloads remain well under the threshold where
+an API layer would be useful. Rebuild order:
+
+```bash
+python data-prep/prep_v2.py
+cd web && npm run gen:profiles
+```
+
+Then run app verification from `web/`.
+
+## Caveats to surface
+
+- Health outcomes are CDC PLACES model-based estimates, not direct counts.
+- ZIP/ZCTA associations are ecological and do not imply causation.
+- ZCTAs approximate USPS ZIP service areas; they are not official mailing boundaries.
+- Backfilled PA/KY values are tract aggregates, not native ZCTA estimates.
+- Rows without PMTiles geometry can appear in search/profile payloads but cannot be map-clicked.

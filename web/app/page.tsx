@@ -25,10 +25,10 @@ export default async function LandingPage() {
           The health of America&apos;s <span className="accent">ZIP codes</span>
         </h1>
         <p className="lede">
-          A map-first atlas of {stats.nMetrics} health measures across{" "}
+          A map-first atlas of {stats.nMetrics} health and social-need measures across{" "}
           <strong style={{ color: "var(--ink)" }}>{nf.format(stats.nZip)}</strong> ZIP/ZCTA areas —
-          chronic, behavioral, mental, and general-health outcomes, each set against the national
-          average and the neighborhood deprivation gradient.
+          chronic disease, behavioral risk, mental health, access, and health-related social needs,
+          each set against the national average, ACS context, and the neighborhood deprivation gradient.
         </p>
 
         <div className="hero-actions">
@@ -50,15 +50,15 @@ export default async function LandingPage() {
         <div className="stat-strip" role="list" aria-label="Dataset at a glance">
           <div className="stat" role="listitem">
             <div className="num">{nf.format(stats.nZip)}</div>
-            <div className="lbl">ZIP/ZCTA areas mapped</div>
+            <div className="lbl">{nf.format(stats.nMappableZip)} mappable areas in the current PMTiles</div>
           </div>
           <div className="stat" role="listitem">
             <div className="num">{stats.nMetrics}</div>
-            <div className="lbl">health measures, 5 domains</div>
+            <div className="lbl">health and social-need measures</div>
           </div>
           <div className="stat" role="listitem">
             <div className="num">{stats.nStates}</div>
-            <div className="lbl">U.S. states covered</div>
+            <div className="lbl">states plus DC covered</div>
           </div>
           <div className="stat" role="listitem">
             <div className="num">
@@ -107,7 +107,7 @@ export default async function LandingPage() {
             <h3>Find your ZIP</h3>
             <p>
               Type any 5-digit ZIP for its health snapshot — a composite score plus every measure
-              placed against your state and the nation, with the map zoomed to your area.
+              placed against local demographics, your state, and the nation.
             </p>
             <span className="f-go">Open a snapshot →</span>
           </Link>
@@ -128,8 +128,8 @@ export default async function LandingPage() {
             </span>
             <h3>Read the method</h3>
             <p>
-              Transparent about what the numbers are — modeled small-area estimates, the ZIP-vs-ZCTA
-              distinction, missingness, and the limits of ecological data.
+              Transparent about modeled estimates, tract-to-ZCTA backfill, the ZIP-vs-ZCTA distinction,
+              missingness, and the limits of ecological data.
             </p>
             <span className="f-go">Methods &amp; limits →</span>
           </Link>
@@ -140,7 +140,7 @@ export default async function LandingPage() {
       <section className="section" aria-labelledby="measures-title">
         <div className="section-head">
           <span className="section-eyebrow">The measures</span>
-          <h2 id="measures-title">{stats.nMetrics} outcomes, from cardiometabolic to mental health.</h2>
+          <h2 id="measures-title">{stats.nMetrics} measures, from cardiometabolic risk to social needs.</h2>
           <p className="section-lede">
             Every measure carries its label, unit, source, national benchmark, missingness, and
             direction. Jump straight to any of them on the map.

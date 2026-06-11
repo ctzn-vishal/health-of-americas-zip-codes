@@ -3,7 +3,7 @@ import { ImageResponse } from "next/og";
 // Required for a metadata image route under `output: export` — bake the PNG at build time.
 export const dynamic = "force-static";
 
-export const alt = "Health of America's ZIP Codes — a map-first atlas of U.S. health outcomes";
+export const alt = "Health of America's ZIP Codes — a map-first atlas of U.S. ZIP/ZCTA health and social context";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -20,8 +20,7 @@ export default function OpengraphImage() {
           justifyContent: "space-between",
           padding: "72px",
           backgroundColor: "#080b12",
-          backgroundImage:
-            "radial-gradient(900px 520px at 78% -8%, rgba(108,182,255,0.22), transparent 60%), radial-gradient(760px 440px at 0% 0%, rgba(244,103,93,0.16), transparent 55%)",
+          backgroundImage: "linear-gradient(180deg, #071017 0%, #080b12 48%, #0b0f17 100%)",
           color: "#e9eef6",
           fontFamily: "Georgia, serif",
         }}
@@ -76,8 +75,8 @@ export default function OpengraphImage() {
             lineHeight: 1.4,
           }}
         >
-          31,491 ZIP/ZCTA areas · 10 health measures · mapped against the national average and
-          neighborhood deprivation.
+          32,409 ZIP/ZCTA areas · 26 health and social-need measures · ACS demographics, ADI, and
+          national/state comparisons.
         </div>
       </div>
     ),
