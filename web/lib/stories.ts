@@ -32,6 +32,18 @@ export const STORIES: StoryDef[] = [
     title: "Where the gradient bites — and where it doesn't",
     dek: "Complete tooth loss is three times higher in the most-deprived tenth of neighborhoods. Binge drinking is the one measure that runs the other way.",
   },
+  {
+    slug: "diagnosis-gap",
+    kicker: "Outcome story · mental health",
+    title: "Distress follows poverty. Diagnosis follows privilege.",
+    dek: "Frequent mental distress tracks deprivation closely; diagnosed depression barely does. The gap between the two — diagnoses per unit of distress — rises with income and falls sharply where more residents are Black.",
+  },
+  {
+    slug: "tobacco-belt",
+    kicker: "Outcome story · smoking",
+    title: "Smoking: deprivation predicts it, culture bends it",
+    dek: "No measure tracks neighborhood deprivation more tightly than smoking (ρ = 0.80). Subtract that prediction and what remains is a map of history: the tobacco belt, Utah, and the casino frontier.",
+  },
 ];
 
 export const storyPath = (slug: string) => `/stories/${slug}/`;

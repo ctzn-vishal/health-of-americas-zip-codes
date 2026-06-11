@@ -41,10 +41,25 @@ export default function DotMap({ mode, archLabels }: { mode: "pc1" | "cluster"; 
     const ctx = cv.getContext("2d")!;
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, width, h);
+    // base pass: every ZCTA, dim — keeps the national outline whole where the
+    // 26-measure complete case has no coverage (mostly small rural areas)
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = "#2c3545";
     for (let i = 0; i < data.n; i++) {
+      if (data.cluster[i] >= 0) continue;
       const p = projection([data.lon[i], data.lat[i]]);
       if (!p) continue;
-      ctx.globalAlpha = 0.8;
+      const r = 0.5 + Math.min(1.4, Math.sqrt(data.pop[i]) / 220);
+      ctx.beginPath();
+      ctx.arc(p[0], p[1], r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // colored pass: covered ZCTAs on top
+    ctx.globalAlpha = 0.8;
+    for (let i = 0; i < data.n; i++) {
+      if (data.cluster[i] < 0) continue;
+      const p = projection([data.lon[i], data.lat[i]]);
+      if (!p) continue;
       ctx.fillStyle = mode === "pc1" ? pc1Color(data.pc1[i]) : ARCH_COLORS[data.cluster[i]] ?? "#5d6675";
       const r = 0.55 + Math.min(2.1, Math.sqrt(data.pop[i]) / 160);
       ctx.beginPath();
@@ -88,6 +103,10 @@ export default function DotMap({ mode, archLabels }: { mode: "pc1" | "cluster"; 
             </span>
           ))
         )}
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--muted)" }}>
+          <i style={{ width: 9, height: 9, borderRadius: "50%", background: "#2c3545", display: "inline-block" }} />
+          no full-measure coverage
+        </span>
         <span style={{ marginLeft: "auto", color: "var(--muted)" }}>Dot size ∝ population</span>
       </div>
     </div>

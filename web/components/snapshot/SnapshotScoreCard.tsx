@@ -38,6 +38,35 @@ export default function SnapshotScoreCard({
   const arch = profile.a ? ARCHETYPES[profile.a[0]] : null;
   const { strengths, concerns } = standouts(metrics, profile.m);
 
+  // One plain-English sentence synthesizing score + archetype + standouts.
+  let verdict: React.ReactNode = null;
+  if (score) {
+    const burdenPhrase =
+      score.score >= 67
+        ? `carries less combined health burden than ${score.healthierThan}% of U.S. ZIP areas`
+        : score.score <= 33
+          ? `carries more combined health burden than ${100 - score.healthierThan}% of U.S. ZIP areas`
+          : "sits near the middle of U.S. ZIP areas for combined health burden";
+    verdict = (
+      <p className="snap-verdict">
+        <strong>{city || `ZIP ${zip}`}</strong> {burdenPhrase}
+        {arch ? <>, and profiles as a {arch.short.toLowerCase()} community</> : null}.
+        {concerns[0] ? (
+          <>
+            {" "}
+            {concerns[0].metric.short_label}
+            {concerns[1] ? ` and ${concerns[1].metric.short_label.toLowerCase()}` : ""} stand out most
+            {strengths[0] ? (
+              <>; {strengths[0].metric.short_label.toLowerCase()} is a relative bright spot.</>
+            ) : (
+              "."
+            )}
+          </>
+        ) : null}
+      </p>
+    );
+  }
+
   return (
     <div className="snap-card">
       <div className="snap-head">
@@ -65,6 +94,8 @@ export default function SnapshotScoreCard({
       ) : (
         <p className="muted">No composite score available for this ZIP.</p>
       )}
+
+      {verdict}
 
       {arch && profile.a && (
         <p className="arch-chip-row">

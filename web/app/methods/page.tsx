@@ -194,6 +194,13 @@ export default async function MethodsPage() {
               <strong>Deprivation gradients</strong> are population-weighted means by ADI
               national-rank decile, shown relative to the least-deprived decile.
             </li>
+            <li>
+              <strong>Outcome stories</strong> use all ZCTAs with the relevant measures (not the
+              complete case). The smoking story fits a quadratic of smoking on ADI and maps the
+              residual; the mental-health story uses the ratio of diagnosed depression to frequent
+              mental distress as a crude diagnosis-access index. Both are descriptive decompositions,
+              not causal models.
+            </li>
           </ul>
           <p>
             The <strong>community type</strong> shown on each ZIP snapshot is that ZIP&apos;s k-means

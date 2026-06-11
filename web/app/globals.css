@@ -534,6 +534,11 @@ a.feature:hover { border-color: var(--line-2); transform: translateY(-2px); text
 }
 a.story-card:hover { border-color: var(--line-2); transform: translateY(-2px); text-decoration: none; }
 .story-card .sc-kicker { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-cool); font-weight: 700; }
+.story-card .sc-sig {
+  width: 100%; height: 72px; display: block; border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02); border: 1px solid var(--line);
+  margin: 2px 0;
+}
 .story-card h3 { font-family: var(--serif); font-size: 21px; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; }
 .story-card p { color: var(--muted); font-size: 13.5px; line-height: 1.6; margin: 0; }
 .story-card .sc-stat { font-family: var(--serif); font-size: 30px; color: var(--ink); font-variant-numeric: tabular-nums; }

@@ -18,6 +18,7 @@ export default function SiteFooter() {
           <h4>Explore</h4>
           <div className="foot-links">
             <Link href="/atlas">Interactive atlas</Link>
+            <Link href="/stories">Stories — what the data teaches</Link>
             <Link href="/methods">Methods &amp; limitations</Link>
             <Link href="/sources">Sources &amp; provenance</Link>
           </div>

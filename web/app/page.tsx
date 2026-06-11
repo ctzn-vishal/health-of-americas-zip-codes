@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ZipSearch from "@/components/search/ZipSearch";
+import StorySig from "@/components/stories/StorySig";
 import { getLandingStats, getMetricCatalog, getPca } from "@/lib/serverData";
 import { SITE } from "@/lib/site";
 import { STORIES, storyPath } from "@/lib/stories";
@@ -153,6 +154,7 @@ export default async function LandingPage() {
             <Link key={s.slug} className="story-card" href={storyPath(s.slug)}>
               <span className="sc-kicker">{s.kicker}</span>
               <h3>{s.title}</h3>
+              <StorySig slug={s.slug} />
               <p>{s.dek}</p>
               <span className="sc-go">Read the story →</span>
             </Link>

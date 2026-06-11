@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getArchetypes, getCorrelations, getGradients, getPca } from "@/lib/serverData";
+import StorySig from "@/components/stories/StorySig";
+import { getArchetypes, getCorrelations, getGradients, getMentalHealth, getPca, getSmoking } from "@/lib/serverData";
 import { STORIES, storyPath } from "@/lib/stories";
 
 export const metadata: Metadata = {
@@ -10,11 +11,13 @@ export const metadata: Metadata = {
 };
 
 export default async function StoriesIndex() {
-  const [pca, corr, arch, grad] = await Promise.all([
+  const [pca, corr, arch, grad, mh, smoke] = await Promise.all([
     getPca(),
     getCorrelations(),
     getArchetypes(),
     getGradients(),
+    getMentalHealth(),
+    getSmoking(),
   ]);
   const pc1 = Math.round(pca.explained[0] * 100);
   const topPair = corr.top_pairs[0];
@@ -44,6 +47,18 @@ export default async function StoriesIndex() {
         <span className="unit"> {steepest.short.toLowerCase()}, most- vs least-deprived</span>
       </span>
     ),
+    "diagnosis-gap": (
+      <span className="sc-stat">
+        ρ {mh.corr.ratio.black}
+        <span className="unit"> diagnosis ratio × Black population share</span>
+      </span>
+    ),
+    "tobacco-belt": (
+      <span className="sc-stat">
+        ρ {smoke.rho_adi}
+        <span className="unit"> smoking × neighborhood deprivation</span>
+      </span>
+    ),
   };
 
   return (
@@ -63,6 +78,7 @@ export default async function StoriesIndex() {
           <Link key={s.slug} className="story-card" href={storyPath(s.slug)}>
             <span className="sc-kicker">{s.kicker}</span>
             <h3>{s.title}</h3>
+            <StorySig slug={s.slug} />
             {stats[s.slug]}
             <p>{s.dek}</p>
             <span className="sc-go">Read the story →</span>

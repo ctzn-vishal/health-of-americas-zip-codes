@@ -9,9 +9,11 @@ import type {
   GradientsPayload,
   InsightsPayload,
   MapValues,
+  MentalHealthPayload,
   MetricCatalog,
   MetricDistributions,
   PcaPayload,
+  SmokingPayload,
   ProfileShard,
   RegionCatalog,
   StateSummary,
@@ -53,3 +55,5 @@ export const loadPca = () => get<PcaPayload>("analytics/pca.json");
 export const loadArchetypes = () => get<ArchetypesPayload>("analytics/archetypes.json");
 export const loadGradients = () => get<GradientsPayload>("analytics/gradients.json");
 export const loadDotmap = () => get<DotmapPayload>("analytics/dotmap.json");
+export const loadMentalHealth = () => get<MentalHealthPayload>("analytics/mental_health.json");
+export const loadSmoking = () => get<SmokingPayload>("analytics/smoking.json");

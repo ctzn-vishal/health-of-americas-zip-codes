@@ -24,7 +24,8 @@ export default async function FourAmericasStory() {
       <article className="story-body">
         <p>
           Instead of ranking ZIP codes from healthiest to sickest, ask a different question:{" "}
-          <em>what kinds of places exist?</em> Cluster every ZIP code on all 26 measures
+          <em>what kinds of places exist?</em>{" "}
+          Cluster every ZIP code on all 26 measures
           simultaneously — no demographics allowed in — and the algorithm lands on four archetypes.
           Demographics weren&apos;t used to build them, yet each cluster snaps onto a recognizable
           American landscape.

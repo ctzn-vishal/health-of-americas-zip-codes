@@ -352,23 +352,144 @@ def main() -> None:
     })
 
     # ---------------- dot map + per-ZIP axes ----------------
-    geo_mask = complete["has_geometry"].to_numpy(bool)
-    lat = complete["lat"].to_numpy(float)
-    lon = complete["lon"].to_numpy(float)
-    inb = geo_mask & (lat > 17) & (lat < 72) & (lon > -180) & (lon < -60)
+    # Include EVERY geometry-bearing ZCTA so the national outline has no coverage holes;
+    # rows outside the complete-case analysis carry cluster -1 / pc1 -1 and draw dimmed.
+    by_zip = {complete["zip"][i]: (int(labels[i]), int(round(pc1_pct[i]))) for i in range(n)}
+    dgeo = df[df["has_geometry"].fillna(False)].reset_index(drop=True)
+    dlat = dgeo["lat"].to_numpy(float)
+    dlon = dgeo["lon"].to_numpy(float)
+    dinb = (dlat > 17) & (dlat < 72) & (dlon > -180) & (dlon < -60)
+    dgeo = dgeo[dinb].reset_index(drop=True)
+    daxes = [by_zip.get(z, (-1, -1)) for z in dgeo["zip"]]
     write("analytics/dotmap.json", {
-        "n": int(inb.sum()),
-        "lon": [f(x, 2) for x in lon[inb]],
-        "lat": [f(x, 2) for x in lat[inb]],
-        "pc1": [int(round(p)) for p in pc1_pct[inb]],
-        "cluster": [int(c) for c in labels[inb]],
-        "pop": [int(p) for p in pops[inb]],
+        "n": len(dgeo),
+        "n_covered": int(sum(1 for a in daxes if a[0] >= 0)),
+        "lon": [f(x, 2) for x in dgeo["lon"]],
+        "lat": [f(x, 2) for x in dgeo["lat"]],
+        "pc1": [a[1] for a in daxes],
+        "cluster": [a[0] for a in daxes],
+        "pop": [int(p) for p in dgeo["population"].fillna(0)],
         "generated_at": generated_at,
     })
 
     write("analytics/zip_axes.json", {
         "fields": ["cluster", "pc1_pct"],
         "zips": {complete["zip"][i]: [int(labels[i]), int(round(pc1_pct[i]))] for i in range(n)},
+        "generated_at": generated_at,
+    })
+
+    # ---------------- outcome story: diagnosed depression vs mental distress ----------------
+    # Uses every row with BOTH measures (not the 26-measure complete case).
+    mh = df.dropna(subset=["depression", "mhlth"])
+    mh = mh[mh["mhlth"] > 0].reset_index(drop=True)
+    ratio = (mh["depression"] / mh["mhlth"]).to_numpy(float)
+    wpop = mh["population"].fillna(0).to_numpy(float)
+    nat_ratio = float(np.average(ratio, weights=np.where(wpop > 0, wpop, 1)))
+
+    def ctx_corrs(frame, series) -> dict[str, Any]:
+        out = {}
+        for key in ["income", "college", "black", "adi", "age65", "density"]:
+            cv = frame[f"ctx_{key}"].to_numpy(float)
+            mask = ~np.isnan(cv) & ~np.isnan(series)
+            out[key] = f(spearmanr(series[mask], cv[mask]).statistic, 2)
+        return out
+
+    dep_v = mh["depression"].to_numpy(float)
+    dis_v = mh["mhlth"].to_numpy(float)
+    mh_states = []
+    for st, grp in mh.groupby("state"):
+        if not isinstance(st, str) or len(grp) < 20:
+            continue
+        w = grp["population"].fillna(0).to_numpy(float)
+        w = np.where(w > 0, w, 1)
+        mh_states.append({
+            "state": st,
+            "dep": f(np.average(grp["depression"], weights=w), 1),
+            "dis": f(np.average(grp["mhlth"], weights=w), 1),
+            "ratio": f(np.average(grp["depression"] / grp["mhlth"], weights=w), 2),
+            "n": len(grp),
+        })
+    mh_states.sort(key=lambda r: r["ratio"])
+    samp_mh = np.random.default_rng(SEED).choice(len(mh), size=min(3200, len(mh)), replace=False)
+    slope, intercept = np.polyfit(dis_v, dep_v, 1)
+    mh_geo = mh[mh["has_geometry"].fillna(False) & (mh["lat"] > 17) & (mh["lat"] < 72) & (mh["lon"] > -180) & (mh["lon"] < -60)]
+    write("analytics/mental_health.json", {
+        "n": len(mh),
+        "method": "Diagnosed depression vs frequent mental distress per ZCTA; diagnosis ratio = depression / distress. Spearman correlations; population-weighted state means.",
+        "national_ratio": f(nat_ratio, 2),
+        "corr": {
+            "dep_vs_dis": f(spearmanr(dep_v, dis_v).statistic, 2),
+            "dep": ctx_corrs(mh, dep_v),
+            "dis": ctx_corrs(mh, dis_v),
+            "ratio": ctx_corrs(mh, ratio),
+        },
+        "fit": {"slope": f(slope, 3), "intercept": f(intercept, 2)},
+        "states": mh_states,
+        "scatter": {
+            "zip": [mh["zip"][i] for i in samp_mh],
+            "state": [mh["state"][i] if isinstance(mh["state"][i], str) else None for i in samp_mh],
+            "x": [f(dis_v[i], 1) for i in samp_mh],
+            "y": [f(dep_v[i], 1) for i in samp_mh],
+            "income": [f(mh["ctx_income"][i], 0) for i in samp_mh],
+            "pop": [int(mh["population"][i] or 0) for i in samp_mh],
+        },
+        "map": {
+            "lon": [f(x, 2) for x in mh_geo["lon"]],
+            "lat": [f(x, 2) for x in mh_geo["lat"]],
+            "v": [f(d / s, 2) for d, s in zip(mh_geo["depression"], mh_geo["mhlth"])],
+            "pop": [int(p or 0) for p in mh_geo["population"]],
+            "label": "diagnoses per unit of distress",
+            "center": f(nat_ratio, 2),
+        },
+        "generated_at": generated_at,
+    })
+
+    # ---------------- outcome story: smoking vs deprivation (residual map) ----------------
+    sm = df.dropna(subset=["smoking"])
+    sm = sm[~sm["ctx_adi"].isna()].reset_index(drop=True)
+    adi_v = sm["ctx_adi"].to_numpy(float)
+    smoke_v = sm["smoking"].to_numpy(float)
+    coef = np.polyfit(adi_v, smoke_v, 2)
+    resid = smoke_v - np.polyval(coef, adi_v)
+    sm = sm.assign(resid=resid)
+    sm_states = []
+    for st, grp in sm.groupby("state"):
+        if not isinstance(st, str) or len(grp) < 20:
+            continue
+        w = grp["population"].fillna(0).to_numpy(float)
+        w = np.where(w > 0, w, 1)
+        sm_states.append({
+            "state": st,
+            "resid": f(np.average(grp["resid"], weights=w), 1),
+            "smoke": f(np.average(grp["smoking"], weights=w), 1),
+            "n": len(grp),
+        })
+    sm_states.sort(key=lambda r: r["resid"])
+    grid = np.linspace(np.quantile(adi_v, 0.01), np.quantile(adi_v, 0.99), 40)
+    samp_sm = np.random.default_rng(SEED + 1).choice(len(sm), size=min(3200, len(sm)), replace=False)
+    sm_geo = sm[sm["has_geometry"].fillna(False) & (sm["lat"] > 17) & (sm["lat"] < 72) & (sm["lon"] > -180) & (sm["lon"] < -60)]
+    write("analytics/smoking.json", {
+        "n": len(sm),
+        "method": "Quadratic fit of smoking prevalence on ADI national rank; residual = actual minus predicted-from-deprivation. Population-weighted state means.",
+        "rho_adi": f(spearmanr(smoke_v, adi_v).statistic, 2),
+        "corr": ctx_corrs(sm, smoke_v),
+        "curve": [[f(x, 1), f(np.polyval(coef, x), 2)] for x in grid],
+        "states": sm_states,
+        "scatter": {
+            "zip": [sm["zip"][i] for i in samp_sm],
+            "state": [sm["state"][i] if isinstance(sm["state"][i], str) else None for i in samp_sm],
+            "x": [f(adi_v[i], 1) for i in samp_sm],
+            "y": [f(smoke_v[i], 1) for i in samp_sm],
+            "pop": [int(sm["population"][i] or 0) for i in samp_sm],
+        },
+        "map": {
+            "lon": [f(x, 2) for x in sm_geo["lon"]],
+            "lat": [f(x, 2) for x in sm_geo["lat"]],
+            "v": [f(r, 1) for r in sm_geo["resid"]],
+            "pop": [int(p or 0) for p in sm_geo["population"]],
+            "label": "points above/below deprivation-predicted smoking",
+            "center": 0,
+        },
         "generated_at": generated_at,
     })
 

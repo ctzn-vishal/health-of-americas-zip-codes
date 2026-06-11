@@ -2,6 +2,7 @@
 // render real prose + figure chrome into the static HTML around the client D3 islands.
 import Link from "next/link";
 import { STORIES, storyPath, type StoryDef } from "@/lib/stories";
+import StorySig from "./StorySig";
 
 export function StoryHead({ story, meta }: { story: StoryDef; meta: string }) {
   return (
@@ -45,6 +46,7 @@ export function StoryNext({ current }: { current: string }) {
           <Link key={s.slug} className="story-card" href={storyPath(s.slug)}>
             <span className="sc-kicker">{s.kicker}</span>
             <h3>{s.title}</h3>
+            <StorySig slug={s.slug} />
             <span className="sc-go">Read the story →</span>
           </Link>
         ))}

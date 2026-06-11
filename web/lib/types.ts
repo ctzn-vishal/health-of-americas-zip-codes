@@ -314,11 +314,64 @@ export interface GradientsPayload {
 
 export interface DotmapPayload {
   n: number;
+  n_covered: number;
   lon: number[];
   lat: number[];
-  pc1: number[]; // PC1 burden percentile 0..100
-  cluster: number[];
+  pc1: number[]; // PC1 burden percentile 0..100; -1 = not in complete case
+  cluster: number[]; // -1 = not in complete case
   pop: number[];
+  generated_at: string;
+}
+
+// outcome-story payloads (analytics/mental_health.json, analytics/smoking.json)
+export interface OutcomeMapData {
+  lon: number[];
+  lat: number[];
+  v: number[];
+  pop: number[];
+  label: string;
+  center: number; // diverging midpoint (national ratio / zero residual)
+}
+
+export interface MentalHealthPayload {
+  n: number;
+  method: string;
+  national_ratio: number;
+  corr: {
+    dep_vs_dis: number;
+    dep: Record<string, number | null>;
+    dis: Record<string, number | null>;
+    ratio: Record<string, number | null>;
+  };
+  fit: { slope: number; intercept: number };
+  states: { state: string; dep: number; dis: number; ratio: number; n: number }[];
+  scatter: {
+    zip: string[];
+    state: (string | null)[];
+    x: number[]; // distress
+    y: number[]; // diagnosed depression
+    income: (number | null)[];
+    pop: number[];
+  };
+  map: OutcomeMapData;
+  generated_at: string;
+}
+
+export interface SmokingPayload {
+  n: number;
+  method: string;
+  rho_adi: number;
+  corr: Record<string, number | null>;
+  curve: [number, number][]; // quadratic fit over ADI grid
+  states: { state: string; resid: number; smoke: number; n: number }[];
+  scatter: {
+    zip: string[];
+    state: (string | null)[];
+    x: number[]; // ADI
+    y: number[]; // smoking
+    pop: number[];
+  };
+  map: OutcomeMapData;
   generated_at: string;
 }
 

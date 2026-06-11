@@ -8,9 +8,11 @@ import type {
   ChartsPayload,
   CorrelationsPayload,
   GradientsPayload,
+  MentalHealthPayload,
   MetricCatalog,
   PcaPayload,
   RegionCatalog,
+  SmokingPayload,
 } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "public", "data");
@@ -47,6 +49,8 @@ export const getCorrelations = () => readJson<CorrelationsPayload>("analytics/co
 export const getPca = () => readJson<PcaPayload>("analytics/pca.json");
 export const getArchetypes = () => readJson<ArchetypesPayload>("analytics/archetypes.json");
 export const getGradients = () => readJson<GradientsPayload>("analytics/gradients.json");
+export const getMentalHealth = () => readJson<MentalHealthPayload>("analytics/mental_health.json");
+export const getSmoking = () => readJson<SmokingPayload>("analytics/smoking.json");
 
 export interface LandingStats {
   nZip: number;
