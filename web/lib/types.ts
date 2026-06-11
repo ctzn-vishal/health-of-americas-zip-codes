@@ -272,8 +272,10 @@ export interface PcaPayload {
 
 export interface ArchetypeCluster {
   id: number;
-  n: number;
-  pop: number;
+  n: number; // complete-case (fit) count
+  pop: number; // complete-case population
+  n_assigned: number; // nearest-centroid assignment, >= 18 of 26 measures observed
+  pop_assigned: number;
   share: number;
   label: string;
   blurb: string;
@@ -287,7 +289,8 @@ export interface ArchetypeCluster {
 
 export interface ArchetypesPayload {
   k: number;
-  n: number;
+  n: number; // complete-case (fit) count
+  n_assigned: number; // total ZCTAs with an archetype assignment
   silhouette: number;
   method: string;
   ids: string[];

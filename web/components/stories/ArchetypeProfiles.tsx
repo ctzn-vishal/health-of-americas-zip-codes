@@ -70,7 +70,7 @@ export default function ArchetypeProfiles({ data }: { data: ArchetypesPayload })
             {c.label}
           </h3>
           <p className="arch-pop">
-            {fmtPop(c.pop)} people · {c.n.toLocaleString()} ZIP areas ({Math.round(c.share * 100)}% of analyzed)
+            {fmtPop(c.pop_assigned)} people · {c.n_assigned.toLocaleString()} ZIP areas assigned
           </p>
           <p className="arch-blurb">{c.blurb}</p>
           <div className="arch-stats">

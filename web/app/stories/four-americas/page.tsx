@@ -19,7 +19,7 @@ export default async function FourAmericasStory() {
     <main id="main" className="story-wrap">
       <StoryHead
         story={story}
-        meta={`k-means clustering on all 26 standardized measures · ${arch.n.toLocaleString()} ZIP/ZCTA areas · k = ${arch.k} chosen by silhouette`}
+        meta={`k-means on all 26 standardized measures (fit on ${arch.n.toLocaleString()} complete-case areas, k = ${arch.k} by silhouette) · ${arch.n_assigned.toLocaleString()} areas assigned`}
       />
       <article className="story-body">
         <p>
@@ -39,6 +39,9 @@ export default async function FourAmericasStory() {
               The geography is not random: comfortable suburbs ring the metros, young metro strivers
               fill the urban cores and inner suburbs, aging small towns cover the rural Midwest and
               Mountain West, and left-behind communities concentrate across the South and Appalachia.
+              Clusters are fit on areas with complete data; areas observing at least 18 of the 26
+              measures are then assigned to their nearest archetype, so the map covers{" "}
+              {arch.n_assigned.toLocaleString()} of 32,409 ZIP/ZCTA areas.
             </>
           }
         >
@@ -62,11 +65,12 @@ export default async function FourAmericasStory() {
         <h2>The cluster that breaks the income story</h2>
         <p>
           Three of the four clusters line up with the deprivation axis: {suburbs.label.toLowerCase()}{" "}
-          ({fmtM(suburbs.pop)} people) sit below the norm on nearly everything,{" "}
-          {towns.label.toLowerCase()} ({fmtM(towns.pop)}) sit moderately above,{" "}
-          {leftBehind.label.toLowerCase()} ({fmtM(leftBehind.pop)}) far above. The fourth refuses to
-          fit. <strong>{metro.label}</strong> — {fmtM(metro.pop)} people in dense, young, diverse
-          ZIP codes — score <em>better</em> than the comfortable suburbs on cancer and heart disease,
+          ({fmtM(suburbs.pop_assigned)} people) sit below the norm on nearly everything,{" "}
+          {towns.label.toLowerCase()} ({fmtM(towns.pop_assigned)}) sit moderately above,{" "}
+          {leftBehind.label.toLowerCase()} ({fmtM(leftBehind.pop_assigned)}) far above. The fourth
+          refuses to fit. <strong>{metro.label}</strong> — {fmtM(metro.pop_assigned)} people in
+          dense, young, diverse ZIP codes — score <em>better</em> than the comfortable suburbs on
+          cancer and heart disease,
           and dramatically <em>worse</em> on loneliness ({metro.z.loneliness! >= 0 ? "+" : ""}
           {metro.z.loneliness} SD), skipped checkups (+{metro.z.no_checkup} SD), lack of insurance
           (+{metro.z.uninsured} SD), and social support.
@@ -78,9 +82,9 @@ export default async function FourAmericasStory() {
           being young and urban protects your arteries and starves your support network.
         </p>
 
-        <h2>A quarter of the population, most of the burden</h2>
+        <h2>A fraction of the population, most of the burden</h2>
         <p>
-          {leftBehind.label} hold {fmtM(leftBehind.pop)} people — the smallest of the four groups —
+          {leftBehind.label} hold {fmtM(leftBehind.pop_assigned)} people — the smallest of the four groups —
           yet they sit {leftBehind.z.ghlth}+ standard deviations above the norm on self-rated poor
           health and food insecurity alike, with median household income of about $
           {Math.round((leftBehind.context.income ?? 0) / 1000)}k against the suburbs&apos; $

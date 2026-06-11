@@ -203,8 +203,13 @@ export default async function MethodsPage() {
             </li>
           </ul>
           <p>
-            The <strong>community type</strong> shown on each ZIP snapshot is that ZIP&apos;s k-means
-            assignment. ZIPs missing any of the 26 measures have no assignment and show no type.
+            The <strong>community type</strong> shown on each ZIP snapshot is that ZIP&apos;s
+            archetype assignment. Clusters are <em>fit</em> on complete-case areas only; any ZCTA
+            observing at least 18 of the 26 measures is then <em>assigned</em> to its nearest
+            centroid using the dimensions it observes (for complete rows this equals the k-means
+            label). The same rule fills the story dot maps, with PC1 scores for partially observed
+            rows computed by available-dimension projection. ZCTAs with fewer than 18 measures have
+            no assignment and show no type.
           </p>
 
           <h2>Color &amp; accessibility</h2>

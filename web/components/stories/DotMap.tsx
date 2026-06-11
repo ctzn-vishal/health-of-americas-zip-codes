@@ -105,7 +105,7 @@ export default function DotMap({ mode, archLabels }: { mode: "pc1" | "cluster"; 
         )}
         <span style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--muted)" }}>
           <i style={{ width: 9, height: 9, borderRadius: "50%", background: "#2c3545", display: "inline-block" }} />
-          no full-measure coverage
+          too few measures to assign
         </span>
         <span style={{ marginLeft: "auto", color: "var(--muted)" }}>Dot size ∝ population</span>
       </div>

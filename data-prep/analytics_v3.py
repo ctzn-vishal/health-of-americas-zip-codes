@@ -275,6 +275,36 @@ def main() -> None:
     labels = np.array([remap[c] for c in labels])
     centers = km.cluster_centers_[np.argsort(burden)]
 
+    # ---------------- extended assignment ----------------
+    # The FIT stays complete-case (above). ASSIGNMENT extends to every row observing at
+    # least 18 of the 26 measures, so maps and snapshot tags don't go blank in states
+    # where one newer measure (chiefly loneliness) is unpublished:
+    #   - PC1 by available-dimension projection with the regression rescale
+    #     (sum of obs loadings * z / sum of obs squared loadings; exact for complete rows)
+    #   - archetype by nearest centroid using only observed dimensions
+    #     (identical to the k-means label for complete rows)
+    M_all = df[ids].to_numpy(float)
+    Z_all = (M_all - mu) / sd
+    obs = ~np.isnan(Z_all)
+    n_obs = obs.sum(axis=1)
+    assignable = n_obs >= 18
+    Z0 = np.where(obs, Z_all, 0.0)
+    l1 = load[0]
+    denom1 = (obs * (l1**2)).sum(axis=1)
+    pc1_all = np.where(assignable & (denom1 > 1e-9), Z0 @ l1 / np.maximum(denom1, 1e-9), np.nan)
+    dists = np.full((len(df), k), np.inf)
+    for c in range(k):
+        diff2 = np.where(obs, Z_all - centers[c], 0.0) ** 2
+        dists[:, c] = diff2.sum(axis=1) / np.maximum(n_obs, 1)
+    cluster_all = np.where(assignable, np.argmin(dists, axis=1), -1)
+    a_idx = np.where(assignable)[0]
+    order_pc1 = pc1_all[a_idx].argsort().argsort()
+    pct_all = np.full(len(df), -1.0)
+    pct_all[a_idx] = order_pc1 / max(len(a_idx) - 1, 1) * 100
+    n_assigned = int(assignable.sum())
+    df_pop = df["population"].fillna(0).to_numpy(float)
+    print(f"extended assignment: {n_assigned} of {len(df)} ZCTAs (complete case {n})")
+
     clusters = []
     for c in range(k):
         mask = labels == c
@@ -289,10 +319,13 @@ def main() -> None:
             cv = sub[f"ctx_{key}"].to_numpy(float)
             ctx[key] = f(np.nanmean(cv), 1)
         meta = ARCHETYPE_LABELS.get(c, {})
+        amask = cluster_all == c
         clusters.append({
             "id": c,
             "n": int(mask.sum()),
             "pop": int(sub["population"].fillna(0).sum()),
+            "n_assigned": int(amask.sum()),
+            "pop_assigned": int(df_pop[amask].sum()),
             "share": f(mask.mean(), 3),
             "label": meta.get("label", f"Cluster {c + 1}"),
             "blurb": meta.get("blurb", ""),
@@ -310,8 +343,9 @@ def main() -> None:
     write("analytics/archetypes.json", {
         "k": k,
         "n": n,
+        "n_assigned": n_assigned,
         "silhouette": f(best_sil, 3),
-        "method": "k-means on z-standardized measures (complete-case ZCTAs); k chosen by silhouette over k=3..8; clusters ordered by mean PC1 burden.",
+        "method": "k-means on z-standardized measures (complete-case ZCTAs); k chosen by silhouette over k=3..8; clusters ordered by mean PC1 burden. Assignment extended to ZCTAs observing >= 18 of 26 measures via nearest centroid on observed dimensions.",
         "ids": ids,
         "labels": [by_id[i]["short_label"] for i in ids],
         "topics": [by_id[i]["topic"] for i in ids],
@@ -353,8 +387,12 @@ def main() -> None:
 
     # ---------------- dot map + per-ZIP axes ----------------
     # Include EVERY geometry-bearing ZCTA so the national outline has no coverage holes;
-    # rows outside the complete-case analysis carry cluster -1 / pc1 -1 and draw dimmed.
-    by_zip = {complete["zip"][i]: (int(labels[i]), int(round(pc1_pct[i]))) for i in range(n)}
+    # the few rows with <18 measures carry cluster -1 / pc1 -1 and draw dimmed.
+    by_zip = {
+        df["zip"][i]: (int(cluster_all[i]), int(round(pct_all[i])))
+        for i in range(len(df))
+        if assignable[i]
+    }
     dgeo = df[df["has_geometry"].fillna(False)].reset_index(drop=True)
     dlat = dgeo["lat"].to_numpy(float)
     dlon = dgeo["lon"].to_numpy(float)
@@ -374,7 +412,8 @@ def main() -> None:
 
     write("analytics/zip_axes.json", {
         "fields": ["cluster", "pc1_pct"],
-        "zips": {complete["zip"][i]: [int(labels[i]), int(round(pc1_pct[i]))] for i in range(n)},
+        "method": "Assigned for ZCTAs observing >= 18 of 26 measures: PC1 via available-dimension projection, archetype via nearest centroid on observed dimensions. Model fit is complete-case.",
+        "zips": {z: [a[0], a[1]] for z, a in by_zip.items()},
         "generated_at": generated_at,
     })
 

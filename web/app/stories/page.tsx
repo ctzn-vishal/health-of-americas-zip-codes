@@ -38,7 +38,7 @@ export default async function StoriesIndex() {
     "four-americas": (
       <span className="sc-stat">
         {arch.k}
-        <span className="unit"> archetypes, {Math.round(arch.n / 1000)}k ZIP areas</span>
+        <span className="unit"> archetypes, {Math.round(arch.n_assigned / 1000)}k ZIP areas</span>
       </span>
     ),
     gradient: (
