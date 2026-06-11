@@ -165,6 +165,41 @@ export default async function MethodsPage() {
         </div>
 
         <article className="prose">
+          <h2>The stories: PCA, clustering, and gradients</h2>
+          <p>
+            The <Link href="/stories">stories section</Link> is precomputed by{" "}
+            <code>data-prep/analytics_v3.py</code> from the same parquet source, over the ~23,800
+            ZIP/ZCTA areas with complete data on all 26 measures (coverage is limited mainly by the
+            newer social-needs measures, especially loneliness, so the smallest rural areas are
+            under-represented; each story states this). Each area is one unweighted observation; all
+            measures are standardized to z-scores first.
+          </p>
+          <ul>
+            <li>
+              <strong>Correlations</strong> are Spearman rank correlations, ordered by average-linkage
+              hierarchical clustering on 1&nbsp;−&nbsp;ρ with optimal leaf ordering.
+            </li>
+            <li>
+              <strong>Principal components</strong> come from PCA on the standardized matrix; PC1 is
+              sign-oriented so that higher always means more burden.
+            </li>
+            <li>
+              <strong>Archetypes</strong> are k-means clusters on the same matrix. k&nbsp;=&nbsp;4 was
+              chosen by silhouette score over k&nbsp;=&nbsp;3…8; clusters are ordered by mean PC1 and
+              hand-labeled. Demographic variables are <em>not</em> used in clustering — they are only
+              described afterwards. Cluster boundaries are soft; treat the labels as portraits, not
+              categories of nature.
+            </li>
+            <li>
+              <strong>Deprivation gradients</strong> are population-weighted means by ADI
+              national-rank decile, shown relative to the least-deprived decile.
+            </li>
+          </ul>
+          <p>
+            The <strong>community type</strong> shown on each ZIP snapshot is that ZIP&apos;s k-means
+            assignment. ZIPs missing any of the 26 measures have no assignment and show no type.
+          </p>
+
           <h2>Color &amp; accessibility</h2>
           <p>
             Ramps are chosen for a clear luminance progression (so they remain legible in grayscale)

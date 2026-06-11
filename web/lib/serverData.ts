@@ -3,7 +3,15 @@
 // HTML — never a "Loading…" shell. Reads the same precomputed payloads the client uses.
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import type { ChartsPayload, MetricCatalog, RegionCatalog } from "./types";
+import type {
+  ArchetypesPayload,
+  ChartsPayload,
+  CorrelationsPayload,
+  GradientsPayload,
+  MetricCatalog,
+  PcaPayload,
+  RegionCatalog,
+} from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "public", "data");
 
@@ -33,6 +41,12 @@ export interface CoverageReport {
 }
 
 export const getCoverageReport = () => readJson<CoverageReport>("coverage_report.json");
+
+// analytics payloads (small enough to read at build time for server-rendered prose)
+export const getCorrelations = () => readJson<CorrelationsPayload>("analytics/correlations.json");
+export const getPca = () => readJson<PcaPayload>("analytics/pca.json");
+export const getArchetypes = () => readJson<ArchetypesPayload>("analytics/archetypes.json");
+export const getGradients = () => readJson<GradientsPayload>("analytics/gradients.json");
 
 export interface LandingStats {
   nZip: number;

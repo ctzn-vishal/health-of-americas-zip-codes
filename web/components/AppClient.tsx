@@ -230,7 +230,14 @@ export default function AppClient() {
         <aside>
           {isSnap ? (
             selected && profile ? (
-              <SnapshotScoreCard zip={selected} profile={profile} nMeasured={profile.m.filter(Boolean).length} onClear={() => onSelect(null)} />
+              <SnapshotScoreCard
+                zip={selected}
+                profile={profile}
+                metrics={catalog.metrics}
+                nMeasured={profile.m.filter(Boolean).length}
+                onClear={() => onSelect(null)}
+                onPickMetric={(id) => setState({ view: "measure", metric: id })}
+              />
             ) : (
               <div className="snap-empty">
                 <h2>See any ZIP&apos;s health snapshot</h2>

@@ -16,6 +16,7 @@ export const SITE = {
 
 export const NAV: { href: string; label: string; cta?: boolean }[] = [
   { href: "/atlas", label: "Atlas" },
+  { href: "/stories", label: "Stories" },
   { href: "/methods", label: "Methods" },
   { href: "/sources", label: "Sources" },
   { href: "/atlas", label: "Open the atlas", cta: true },

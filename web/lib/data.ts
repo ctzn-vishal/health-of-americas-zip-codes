@@ -1,12 +1,17 @@
 // Static payload loaders. Everything is a plain static asset under /data — no server,
 // no secret. Each fetch is cached in-memory so metric switches never refetch.
 import type {
+  ArchetypesPayload,
   ChartsPayload,
+  CorrelationsPayload,
+  DotmapPayload,
   GeoCatalog,
+  GradientsPayload,
   InsightsPayload,
   MapValues,
   MetricCatalog,
   MetricDistributions,
+  PcaPayload,
   ProfileShard,
   RegionCatalog,
   StateSummary,
@@ -41,3 +46,10 @@ export const loadMetricDistributions = () => get<MetricDistributions>("metric_di
 export const loadStateSummary = () => get<StateSummary>("state_summary.json");
 export const loadProfileShard = (zip2: string) => get<ProfileShard>(`profiles/${zip2}.json`);
 export const loadComposite = () => get<MapValues>("map_values/composite.json");
+
+// analytics ("stories") payloads
+export const loadCorrelations = () => get<CorrelationsPayload>("analytics/correlations.json");
+export const loadPca = () => get<PcaPayload>("analytics/pca.json");
+export const loadArchetypes = () => get<ArchetypesPayload>("analytics/archetypes.json");
+export const loadGradients = () => get<GradientsPayload>("analytics/gradients.json");
+export const loadDotmap = () => get<DotmapPayload>("analytics/dotmap.json");

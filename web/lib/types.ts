@@ -213,6 +213,7 @@ export interface ProfileZip {
   c: [string, string | null]; // [city, state]
   pop: number;
   comp: number | null; // composite burden percentile 0..100 (higher = more burden)
+  a?: [number, number] | null; // [archetype cluster id, PC1 burden percentile] — see analytics/zip_axes.json
   q?: [string, number, number, boolean]; // [health_source, health_n_measures, health_n_backfilled, has_geometry]
   x?: [
     number | null,
@@ -228,6 +229,97 @@ export interface ProfileZip {
 }
 export interface ProfileShard {
   zips: Record<string, ProfileZip>;
+}
+
+// ---- analytics (stories) payloads, emitted by data-prep/analytics_v3.py ----
+export interface CorrelationsPayload {
+  n: number;
+  method: string;
+  ids: string[]; // hierarchically ordered
+  labels: string[];
+  topics: string[];
+  matrix: (number | null)[][]; // Spearman rho, same ordering as ids
+  context_keys: string[];
+  context_labels: string[];
+  context_higher: string[];
+  context_matrix: (number | null)[][]; // [measure][context]
+  top_pairs: { a: string; b: string; rho: number; a_label: string; b_label: string }[];
+  generated_at: string;
+}
+
+export interface PcaPayload {
+  n: number;
+  method: string;
+  ids: string[]; // catalog order
+  labels: string[];
+  topics: string[];
+  explained: number[]; // variance ratio per component
+  loadings: number[][]; // [pc 0..2][measure]
+  pc_context: Record<string, number | null>[]; // Spearman of each PC score vs context vars
+  context_labels: Record<string, string>;
+  scatter: {
+    zip: string[];
+    state: (string | null)[];
+    pc1: number[];
+    pc2: number[];
+    adi: (number | null)[];
+    income: (number | null)[];
+    dense: boolean[]; // population density >= 1000 / sq mi
+    pop: number[];
+  };
+  generated_at: string;
+}
+
+export interface ArchetypeCluster {
+  id: number;
+  n: number;
+  pop: number;
+  share: number;
+  label: string;
+  blurb: string;
+  dense_share: number;
+  pc1_mean: number;
+  z: Record<string, number>; // mean z-score per measure
+  raw: Record<string, number>; // mean raw value per measure
+  context: Record<string, number | null>;
+  exemplars: { zip: string; place: string; state: string; pop: number }[];
+}
+
+export interface ArchetypesPayload {
+  k: number;
+  n: number;
+  silhouette: number;
+  method: string;
+  ids: string[];
+  labels: string[];
+  topics: string[];
+  context_labels: Record<string, string>;
+  clusters: ArchetypeCluster[];
+  generated_at: string;
+}
+
+export interface GradientsPayload {
+  method: string;
+  metrics: {
+    id: string;
+    short: string;
+    topic: string;
+    benchmark: number;
+    d: number[]; // pop-weighted mean per ADI decile (1..10)
+    gap: number; // d10 - d1
+    rel: number | null; // d10 / d1
+  }[];
+  generated_at: string;
+}
+
+export interface DotmapPayload {
+  n: number;
+  lon: number[];
+  lat: number[];
+  pc1: number[]; // PC1 burden percentile 0..100
+  cluster: number[];
+  pop: number[];
+  generated_at: string;
 }
 
 // Shared props for every analytical panel (uniform render + cross-highlight contract).

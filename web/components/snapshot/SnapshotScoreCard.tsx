@@ -1,6 +1,8 @@
-import { fmtPop } from "@/lib/format";
-import { readScore } from "@/lib/snapshot";
-import type { ProfileZip } from "@/lib/types";
+import Link from "next/link";
+import { fmtPop, ordinal, valueFmt } from "@/lib/format";
+import { ARCHETYPES, readScore, standouts } from "@/lib/snapshot";
+import { ARCH_COLORS } from "@/components/stories/storyShared";
+import type { MetricMeta, ProfileZip } from "@/lib/types";
 import ScoreGauge from "./ScoreGauge";
 
 function sourceLabel(source: string | undefined) {
@@ -13,13 +15,17 @@ function sourceLabel(source: string | undefined) {
 export default function SnapshotScoreCard({
   zip,
   profile,
+  metrics,
   nMeasured,
   onClear,
+  onPickMetric,
 }: {
   zip: string;
   profile: ProfileZip;
+  metrics: MetricMeta[];
   nMeasured: number;
   onClear: () => void;
+  onPickMetric: (metricId: string) => void;
 }) {
   const [city, state] = profile.c;
   const score = readScore(profile.comp);
@@ -29,6 +35,9 @@ export default function SnapshotScoreCard({
   const backfilled = quality?.[2] ?? 0;
   const hasGeometry = quality?.[3] ?? true;
   const place = [city, state].filter(Boolean).join(", ");
+  const arch = profile.a ? ARCHETYPES[profile.a[0]] : null;
+  const { strengths, concerns } = standouts(metrics, profile.m);
+
   return (
     <div className="snap-card">
       <div className="snap-head">
@@ -52,13 +61,78 @@ export default function SnapshotScoreCard({
             Healthier than <strong>{score.healthierThan}%</strong> of U.S. ZIP areas, averaged across{" "}
             {nMeasured} measures.
           </p>
-          <p className="snap-caveat">
-            Experimental composite — the mean of this ZIP&apos;s national percentiles across available
-            measures, re-ranked. Not an official index; see the per-measure detail.
-          </p>
         </>
       ) : (
         <p className="muted">No composite score available for this ZIP.</p>
+      )}
+
+      {arch && profile.a && (
+        <p className="arch-chip-row">
+          <Link
+            className="arch-chip"
+            href="/stories/four-americas/"
+            title="One of four community archetypes from clustering all 26 measures — read the story"
+          >
+            <span className="arch-dot" style={{ background: ARCH_COLORS[profile.a[0]] }} aria-hidden="true" />
+            {arch.label}
+            <span className="arch-q">— community type ›</span>
+          </Link>
+        </p>
+      )}
+
+      {(strengths.length > 0 || concerns.length > 0) && (
+        <div className="standouts" aria-label="What stands out for this ZIP">
+          {concerns.length > 0 && (
+            <div className="standout-group bad">
+              <h4>Watch — highest national percentiles</h4>
+              <div className="standout-list">
+                {concerns.map((s) => (
+                  <button
+                    key={s.metric.metric_id}
+                    type="button"
+                    className="standout-item"
+                    onClick={() => onPickMetric(s.metric.metric_id)}
+                    title={`Map ${s.metric.label} nationally`}
+                  >
+                    <span className="so-name">{s.metric.short_label}</span>
+                    <span className="so-read">
+                      <strong>{valueFmt(s.metric.format, s.metric.unit)(s.value)}</strong> · {ordinal(s.pct)} pct
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {strengths.length > 0 && (
+            <div className="standout-group good">
+              <h4>Going well — lowest national percentiles</h4>
+              <div className="standout-list">
+                {strengths.map((s) => (
+                  <button
+                    key={s.metric.metric_id}
+                    type="button"
+                    className="standout-item"
+                    onClick={() => onPickMetric(s.metric.metric_id)}
+                    title={`Map ${s.metric.label} nationally`}
+                  >
+                    <span className="so-name">{s.metric.short_label}</span>
+                    <span className="so-read">
+                      <strong>{valueFmt(s.metric.format, s.metric.unit)(s.value)}</strong> · {ordinal(s.pct)} pct
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {score && (
+        <p className="snap-caveat">
+          Experimental composite — the mean of this ZIP&apos;s national percentiles across available
+          measures, re-ranked. Not an official index; see the per-measure detail below. Click a
+          standout to map it nationally.
+        </p>
       )}
     </div>
   );

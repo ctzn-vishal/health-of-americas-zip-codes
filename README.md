@@ -12,6 +12,10 @@ demographics, and neighborhood deprivation.
     areas by overall burden.
   - **Explore by measure** (one outcome at a time): a luminous MapLibre + PMTiles choropleth that
     recolors via feature-state, with four D3 analytical panels and an insight rail.
+- **Stories** (`/stories`): four data-driven essays precomputed from the full 26 × 32k matrix —
+  the single PCA axis behind most place-based health differences (57% of variance), the correlation
+  structure of the measures, four k-means **community archetypes** (each ZIP's snapshot shows its
+  type), and the ADI deprivation gradient across all 26 measures on one chart.
 - Selecting a ZIP **zooms the map to its metro**; state is URL-shareable.
 - Crawlable by design: the landing, methods, and sources pages render **real content and numbers**
   into static HTML — no "Loading…"-only shell.
@@ -87,16 +91,20 @@ and served as static assets, so each ZIP snapshot loads only a small shard at ru
 
 ```bash
 python data-prep/prep_v2.py
+python data-prep/analytics_v3.py
 cd web && npm run gen:profiles
 ```
 
 `prep_v2.py` reads the complete parquet and metadata, cleans ACS sentinels, derives burden-oriented
-measures, writes catalog/map/chart/insight payloads, and emits a coverage report. `gen:profiles`
-then builds profile shards, metric distributions, state summaries, and the composite burden layer.
+measures, writes catalog/map/chart/insight payloads, and emits a coverage report. `analytics_v3.py`
+computes the cross-measure structure behind `/stories` (Spearman matrix, PCA, k-means archetypes,
+ADI gradients, dot-map centroids, per-ZIP archetype assignments). `gen:profiles` then builds profile
+shards (including each ZIP's archetype tag), metric distributions, state summaries, and the
+composite burden layer.
 
 ## Tech stack
 
-Next.js 15 (App Router) · React 19 · TypeScript · MapLibre GL JS · PMTiles · D3 · static export.
+Next.js 16 (App Router, Turbopack) · React 19.2 · TypeScript · MapLibre GL JS · PMTiles · D3 · static export.
 
 ## Data & caveats
 

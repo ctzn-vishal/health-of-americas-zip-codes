@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ZipSearch from "@/components/search/ZipSearch";
-import { getLandingStats, getMetricCatalog } from "@/lib/serverData";
+import { getLandingStats, getMetricCatalog, getPca } from "@/lib/serverData";
 import { SITE } from "@/lib/site";
+import { STORIES, storyPath } from "@/lib/stories";
 
 export const metadata: Metadata = {
   title: "Health of America's ZIP Codes — a map-first atlas of U.S. health outcomes",
@@ -14,7 +15,7 @@ const nf = new Intl.NumberFormat("en-US");
 const millions = (n: number) => `${(n / 1e6).toFixed(1)}M`;
 
 export default async function LandingPage() {
-  const [stats, catalog] = await Promise.all([getLandingStats(), getMetricCatalog()]);
+  const [stats, catalog, pca] = await Promise.all([getLandingStats(), getMetricCatalog(), getPca()]);
 
   return (
     <main id="main" className="landing">
@@ -133,6 +134,29 @@ export default async function LandingPage() {
             </p>
             <span className="f-go">Methods &amp; limits →</span>
           </Link>
+        </div>
+      </section>
+
+      {/* ---------------- stories ---------------- */}
+      <section className="section" aria-labelledby="stories-title">
+        <div className="section-head">
+          <span className="section-eyebrow">Stories</span>
+          <h2 id="stories-title">What the data teaches, not just what it shows.</h2>
+          <p className="section-lede">
+            A single statistical axis explains {Math.round(pca.explained[0] * 100)}% of how ZIP codes
+            differ across all {stats.nMetrics} measures — and it tracks income and deprivation, not
+            any one disease. Four data-driven essays unpack the structure behind the map.
+          </p>
+        </div>
+        <div className="story-cards">
+          {STORIES.map((s) => (
+            <Link key={s.slug} className="story-card" href={storyPath(s.slug)}>
+              <span className="sc-kicker">{s.kicker}</span>
+              <h3>{s.title}</h3>
+              <p>{s.dek}</p>
+              <span className="sc-go">Read the story →</span>
+            </Link>
+          ))}
         </div>
       </section>
 

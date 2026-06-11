@@ -24,6 +24,15 @@ const catalog = read("metric_catalog.json");
 const geo = read("geo_catalog.json"); // compact tuple; see geo_catalog.fields
 const metrics = catalog.metrics.map((m) => m.metric_id);
 
+// per-ZIP [archetype cluster, PC1 burden percentile] from analytics_v3.py (optional —
+// shards still build when the analytics pass hasn't been run yet)
+let zipAxes = {};
+try {
+  zipAxes = read("analytics/zip_axes.json").zips ?? {};
+} catch {
+  console.warn("analytics/zip_axes.json not found — profiles will omit archetype tags");
+}
+
 // ---- load all map_values + national sorted arrays for exact percentiles ----
 const values = {}; // metric -> {zip: value}
 const sorted = {}; // metric -> ascending values[]
@@ -146,6 +155,7 @@ for (const z of zips) {
     c: [g[0], g[1]],
     pop: g[5],
     comp: compPct[z],
+    a: zipAxes[z] ?? null,
     // q = health/provenance quality tuple: [source, n_measures, n_backfilled, has_geometry]
     q: [g[8] ?? "none", g[9] ?? 0, g[10] ?? 0, g[19] ?? true],
     // x = compact context tuple: [ADI, income, poverty, college, Black, Hispanic, 65+, urban]

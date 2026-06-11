@@ -32,6 +32,46 @@ export const COMPOSITE_META: MetricMeta = {
   value_max: 100,
 };
 
+// Community archetypes from the k-means pass (data-prep/analytics_v3.py, burden-ordered).
+// Labels must match ARCHETYPE_LABELS there and analytics/archetypes.json.
+export const ARCHETYPES: { label: string; short: string }[] = [
+  { label: "Comfortable suburbs", short: "Comfortable suburb" },
+  { label: "Young metro strivers", short: "Young metro" },
+  { label: "Aging small towns", short: "Aging small town" },
+  { label: "Left-behind communities", short: "Left-behind" },
+];
+
+export interface StandoutMeasure {
+  metric: MetricMeta;
+  value: number;
+  pct: number; // national percentile, higher = more burden
+}
+
+/**
+ * The most intuitive single-glance summary of a profile: the measures where this ZIP
+ * stands furthest from the middle of the national distribution, split into what is
+ * going well (lowest percentiles) and what stands out as a concern (highest).
+ */
+export function standouts(
+  metrics: MetricMeta[],
+  m: ([number, number] | null)[],
+  count = 3,
+): { strengths: StandoutMeasure[]; concerns: StandoutMeasure[] } {
+  const rows: StandoutMeasure[] = [];
+  metrics.forEach((meta, i) => {
+    const rec = m[i];
+    if (!rec) return;
+    rows.push({ metric: meta, value: rec[0], pct: rec[1] });
+  });
+  const byPct = [...rows].sort((a, b) => a.pct - b.pct);
+  const strengths = byPct.filter((r) => r.pct <= 40).slice(0, count);
+  const concerns = byPct
+    .filter((r) => r.pct >= 60)
+    .slice(-count)
+    .reverse();
+  return { strengths, concerns };
+}
+
 export interface DomainGroup {
   topic: string;
   metrics: MetricMeta[];

@@ -1,7 +1,7 @@
 "use client";
 import { useResize } from "@/components/charts/chartUtils";
 import { valueFmt, ordinal, gapFmt } from "@/lib/format";
-import { groupByDomain } from "@/lib/snapshot";
+import { ARCHETYPES, groupByDomain } from "@/lib/snapshot";
 import type { MetricDistributions, MetricMeta, ProfileZip } from "@/lib/types";
 import StripPlot from "./StripPlot";
 
@@ -23,7 +23,8 @@ function dollars(v: number | null | undefined) {
 function ContextSummary({ profile }: { profile: ProfileZip }) {
   const ctx = profile.x;
   if (!ctx) return null;
-  const [adi, income, poverty, college, black, hispanic, age65, urban] = ctx;
+  const [adi, income, poverty, college, black, hispanic, age65] = ctx;
+  const arch = profile.a ? ARCHETYPES[profile.a[0]] : null;
   const items = [
     { k: "ADI rank", v: adi == null ? "—" : one.format(adi), s: "higher means more deprivation" },
     { k: "Median income", v: dollars(income), s: "ACS household estimate" },
@@ -32,7 +33,7 @@ function ContextSummary({ profile }: { profile: ProfileZip }) {
     { k: "Black", v: pct(black), s: "population share" },
     { k: "Hispanic", v: pct(hispanic), s: "population share" },
     { k: "Age 65+", v: pct(age65), s: "population share" },
-    { k: "Setting", v: urban == null ? "—" : urban ? "Urban" : "Rural", s: "source classification" },
+    { k: "Community type", v: arch ? arch.short : "—", s: "from clustering all 26 measures" },
   ];
   return (
     <div className="context-band" aria-label="ZIP demographic context">
