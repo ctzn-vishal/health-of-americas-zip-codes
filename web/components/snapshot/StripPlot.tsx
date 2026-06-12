@@ -25,13 +25,35 @@ export default function StripPlot({
 }) {
   const gid = useId().replace(/:/g, "");
   const innerW = Math.max(10, width - PAD * 2);
-  const x = d3.scaleLinear().domain([dist.min, dist.max]).range([PAD, PAD + innerW]);
+
+  // truncate extreme tails so outlier ZIPs don't squash the distribution:
+  // keep the central ~98% of mass, but always include the US/state/ZIP markers
+  const total = d3.sum(dist.bins, (b) => b[2]) || 1;
+  let lo = dist.min;
+  let hi = dist.max;
+  let acc = 0;
+  for (const b of dist.bins) {
+    acc += b[2];
+    if (acc / total >= 0.01) { lo = b[0]; break; }
+  }
+  acc = 0;
+  for (let i = dist.bins.length - 1; i >= 0; i--) {
+    acc += dist.bins[i][2];
+    if (acc / total >= 0.01) { hi = dist.bins[i][1]; break; }
+  }
+  const marks = [dist.benchmark, stateMean, value].filter((v): v is number => v != null);
+  lo = Math.min(lo, ...marks);
+  hi = Math.max(hi, ...marks);
+  if (hi <= lo) { lo = dist.min; hi = dist.max; }
+
+  const x = d3.scaleLinear().domain([lo, hi]).range([PAD, PAD + innerW]).clamp(true);
   const color = colorScale("rate", meta.domain, meta.benchmark);
 
   // distribution ridgeline from the histogram bins, smoothed
-  const maxCount = d3.max(dist.bins, (b) => b[2]) || 1;
+  const visBins = dist.bins.filter((b) => (b[0] + b[1]) / 2 >= lo && (b[0] + b[1]) / 2 <= hi);
+  const maxCount = d3.max(visBins, (b) => b[2]) || 1;
   const y = d3.scaleLinear().domain([0, maxCount]).range([BASE, TOP]);
-  const pts: [number, number][] = dist.bins.map((b) => [(b[0] + b[1]) / 2, b[2]]);
+  const pts: [number, number][] = visBins.map((b) => [(b[0] + b[1]) / 2, b[2]]);
   const area = d3
     .area<[number, number]>()
     .x((d) => x(d[0]))
@@ -74,8 +96,8 @@ export default function StripPlot({
       {/* the ZIP itself */}
       {zX != null ? (
         <>
-          <line x1={zX} x2={zX} y1={TOP - 2} y2={BASE} stroke={HALO} strokeWidth={3} />
-          <circle cx={zX} cy={BASE} r={6} fill={color(value as number)} stroke="var(--ink)" strokeWidth={2} />
+          <line x1={zX} x2={zX} y1={TOP - 2} y2={BASE} stroke={HALO} strokeWidth={2.5} />
+          <circle cx={zX} cy={BASE} r={4.5} fill={color(value as number)} stroke="var(--ink)" strokeWidth={1.5} />
         </>
       ) : (
         <text x={PAD + innerW / 2} y={BASE - 6} textAnchor="middle" fontSize={11} fill="var(--muted)">no estimate</text>
