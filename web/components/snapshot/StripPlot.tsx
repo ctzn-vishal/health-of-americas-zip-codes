@@ -27,19 +27,19 @@ export default function StripPlot({
   const innerW = Math.max(10, width - PAD * 2);
 
   // truncate extreme tails so outlier ZIPs don't squash the distribution:
-  // keep the central ~98% of mass, but always include the US/state/ZIP markers
+  // keep the central ~95% of mass, but always include the US/state/ZIP markers
   const total = d3.sum(dist.bins, (b) => b[2]) || 1;
   let lo = dist.min;
   let hi = dist.max;
   let acc = 0;
   for (const b of dist.bins) {
     acc += b[2];
-    if (acc / total >= 0.01) { lo = b[0]; break; }
+    if (acc / total >= 0.025) { lo = b[0]; break; }
   }
   acc = 0;
   for (let i = dist.bins.length - 1; i >= 0; i--) {
     acc += dist.bins[i][2];
-    if (acc / total >= 0.01) { hi = dist.bins[i][1]; break; }
+    if (acc / total >= 0.025) { hi = dist.bins[i][1]; break; }
   }
   const marks = [dist.benchmark, stateMean, value].filter((v): v is number => v != null);
   lo = Math.min(lo, ...marks);

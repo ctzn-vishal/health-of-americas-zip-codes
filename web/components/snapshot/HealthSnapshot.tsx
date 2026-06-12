@@ -2,12 +2,32 @@
 import { useResize } from "@/components/charts/chartUtils";
 import { valueFmt, ordinal, gapFmt } from "@/lib/format";
 import { ARCHETYPES, groupByDomain } from "@/lib/snapshot";
-import type { MetricDistributions, MetricMeta, ProfileZip } from "@/lib/types";
+import type { MetricDistribution, MetricDistributions, MetricMeta, ProfileZip } from "@/lib/types";
 import StripPlot from "./StripPlot";
 
-const LABEL_W = 132;
-const READ_W = 92;
-const GAP = 12;
+/** The chart cell measures itself (the grid column is fluid), so the strip fills it exactly. */
+function StripCell({
+  meta,
+  dist,
+  value,
+  stateMean,
+  stateAbbr,
+}: {
+  meta: MetricMeta;
+  dist: MetricDistribution | undefined;
+  value: number | null;
+  stateMean: number | null;
+  stateAbbr: string;
+}) {
+  const [ref, w] = useResize<HTMLDivElement>();
+  return (
+    <div className="strip-svg" ref={ref}>
+      {dist && w > 0 && (
+        <StripPlot width={w} meta={meta} dist={dist} value={value} stateMean={stateMean} stateAbbr={stateAbbr} />
+      )}
+    </div>
+  );
+}
 
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 const one = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
@@ -61,10 +81,6 @@ export default function HealthSnapshot({
   stateMeans: Record<string, number> | undefined;
   onPickMetric: (metricId: string) => void;
 }) {
-  const [ref, width] = useResize<HTMLDivElement>();
-  // each group column subtracts its own padding; min width keeps strips legible
-  const colW = width > 880 ? (width - 18) / 2 : width;
-  const svgW = Math.max(60, colW - LABEL_W - READ_W - GAP * 2 - 34);
   const state = profile.c[1] ?? "";
   const groups = groupByDomain(metrics);
   // profile.m is positional in catalog order; map metric_id -> [value, pct] | null
@@ -81,7 +97,7 @@ export default function HealthSnapshot({
         <span className="snap-key-note">lower / better&nbsp;←&nbsp;→&nbsp;higher / worse</span>
       </div>
 
-      <div className="snap-strips" ref={ref}>
+      <div className="snap-strips">
         {groups.map((g) => (
           <section className="snap-group" key={g.topic}>
             <h3 className="snap-group-title">{g.topic}</h3>
@@ -109,18 +125,7 @@ export default function HealthSnapshot({
                       </span>
                     )}
                   </button>
-                  <div className="strip-svg">
-                    {dist && (
-                      <StripPlot
-                        width={svgW}
-                        meta={m}
-                        dist={dist}
-                        value={value}
-                        stateMean={stateMean}
-                        stateAbbr={state}
-                      />
-                    )}
-                  </div>
+                  <StripCell meta={m} dist={dist} value={value} stateMean={stateMean} stateAbbr={state} />
                   <div className="strip-read">
                     <span className="strip-val">{value != null ? fmt(value) : "—"}</span>
                     <span className={`strip-pct ${pctClass}`}>
